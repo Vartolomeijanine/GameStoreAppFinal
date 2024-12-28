@@ -1,0 +1,27 @@
+.DS_Store
+*.ini
+*.class
+
+bin/
+.settings/
+
+# Eclipse files
+.project
+.classpath
+.metadata/
+
+# IntelliJ
+.idea/
+out/
+*.iml
+*.ipr
+*.iws
+atlassian-ide-plugin.xml
+
+# Maven files
+target/
+
+# Package Files #
+*.jar
+*.war
+*.ear
