@@ -37,6 +37,12 @@ public class AdminController {
     public void applyDiscountToGame(int gameId, float discountPercentage) {
         adminService.applyDiscountToGame(gameId, discountPercentage);
     }
+
+    public boolean deleteAnyAccount(String email) {
+        return adminService.deleteAnyAccount(email);
+    }
+
+
     public void setLoggedInAdmin(Admin admin) {
         adminService.setLoggedInAdmin(admin);
     }

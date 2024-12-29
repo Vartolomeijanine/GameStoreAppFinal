@@ -60,9 +60,9 @@ public class RepoMenu {
 
         // Initialize services
         // Initialize services pentru InMemory
-        AccountService accountService = new AccountService(userRepository);
+        AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository);
         GameService gameService = new GameService(gameRepository);
-        AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository);
+        AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository);
         DeveloperService developerService = new DeveloperService(gameRepository, developerRepository);
 
         // Initialize controllers

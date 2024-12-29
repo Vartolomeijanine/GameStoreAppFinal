@@ -3,6 +3,8 @@ package Controller;
 import Model.Developer;
 import Model.Game;
 import Service.DeveloperService;
+
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -53,4 +55,9 @@ public class DeveloperController {
     public void modifyGame(Integer gameId, String newName, String newDescription, String newGenre, Float newPrice) {
         developerService.modifyGame(gameId, newName, newDescription, newGenre, newPrice);
     }
+
+    public List<Game> getPublishedGames() {
+        return developerService.getPublishedGames();
+    }
+
 }

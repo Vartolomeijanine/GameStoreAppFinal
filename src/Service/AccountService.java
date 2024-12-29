@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import Exception.BusinessLogicException;
+import Repository.InMemoryRepository;
 
 /**
  * Service class for managing user accounts, including authentication, role-based signup, and account deletion.
@@ -33,19 +34,25 @@ public class AccountService {
 //    }
 
     // Constructor pentru InMemory
-    public AccountService(IRepository<User> userRepository) {
-        this.userRepository = userRepository;
-        this.adminRepository = null;
-        this.developerRepository = null;
-        // this.customerRepository = null;
-    }
+//    public AccountService(IRepository<User> userRepository) {
+//        this.userRepository = userRepository;
+//        this.adminRepository = null;
+//        this.developerRepository = null;
+//        // this.customerRepository = null;
+//    }
+//
+//    // Constructor pentru File și Database
+//    public AccountService(IRepository<Admin> adminRepository, IRepository<Developer> developerRepository /*, IRepository<Customer> customerRepository */) {
+//        this.userRepository = null; // Nu este utilizat în File/Database
+//        this.adminRepository = adminRepository;
+//        this.developerRepository = developerRepository;
+//        // this.customerRepository = customerRepository;
+//    }
 
-    // Constructor pentru File și Database
-    public AccountService(IRepository<Admin> adminRepository, IRepository<Developer> developerRepository /*, IRepository<Customer> customerRepository */) {
-        this.userRepository = null; // Nu este utilizat în File/Database
-        this.adminRepository = adminRepository;
-        this.developerRepository = developerRepository;
-        // this.customerRepository = customerRepository;
+    public AccountService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IRepository<Developer> developerRepository) {
+        this.userRepository = userRepository;
+        this.adminRepository = adminRepository != null ? adminRepository : new InMemoryRepository<>();
+        this.developerRepository = developerRepository != null ? developerRepository : new InMemoryRepository<>();
     }
 
     /**
@@ -166,7 +173,7 @@ public class AccountService {
 
 //new 2
     public boolean logIn(String email, String password) {
-        List<User> users = userRepository.getAll();
+        List<User> users = new ArrayList<>(userRepository.getAll());
 
         // Pentru File/DB, verificăm repository-urile specifice
         if (adminRepository != null) {
