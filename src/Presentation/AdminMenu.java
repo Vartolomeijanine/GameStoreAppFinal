@@ -26,9 +26,10 @@ public class AdminMenu {
             System.out.println("2. View Game by ID");
             System.out.println("3. Delete Game");
             System.out.println("4. Apply Discount");
-            System.out.println("5. Delete Account"); // Noua opțiune
-            System.out.println("6. Log Out");
-            System.out.println("7. Exit");
+            System.out.println("5. Delete Account");
+            System.out.println("6. Delete Any Account by Email");
+            System.out.println("7. Log Out");
+            System.out.println("8. Exit");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -39,8 +40,9 @@ public class AdminMenu {
                 case 3 -> handleDeleteGame();
                 case 4 -> handleApplyDiscount();
                 case 5 -> {mainMenu.handleDeleteAccount(); return;}
-                case 6 -> {mainMenu.handleLogOut(); return;}
-                case 7 -> mainMenu.exitApp();
+                case 6 -> handleDeleteAnyAccount();
+                case 7 -> {mainMenu.handleLogOut(); return;}
+                case 8 -> mainMenu.exitApp();
                 default -> System.out.println("Invalid option. Try again.");
             }
         }
@@ -64,6 +66,18 @@ public class AdminMenu {
         scanner.nextLine();
         adminController.applyDiscountToGame(gameId, discount);
         System.out.println("Discount applied successfully.");
+    }
+
+    private void handleDeleteAnyAccount() {
+        System.out.print("Enter the email of the account to delete: ");
+        String email = scanner.nextLine();
+
+        try {
+            adminController.deleteAnyAccount(email);
+            System.out.println("Account deleted successfully.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
 

@@ -1,10 +1,11 @@
 package Service;
 
-import Model.Admin;
-import Model.Discount;
-import Model.Game;
+import Model.*;
 import Repository.IRepository;
 import Exception.BusinessLogicException;
+
+import javax.management.relation.Role;
+import java.util.List;
 
 /**
  * Service class for admin-specific functions, such as managing games and applying discounts.
@@ -13,6 +14,8 @@ public class AdminService {
     private final IRepository<Game> gameRepository;
     private final IRepository<Admin> adminRepository;
     private final IRepository<Discount> discountRepository;
+    private final IRepository<User> userRepository;
+    private final IRepository<Developer> developerRepository;
     private Admin loggedInAdmin;
 
     /**
@@ -22,10 +25,12 @@ public class AdminService {
      * @param adminRepository The repository for managing admins.
      * @param discountRepository The repository for managing discounts.
      */
-    public AdminService(IRepository<Game> gameRepository, IRepository<Admin> adminRepository, IRepository<Discount> discountRepository) {
+    public AdminService(IRepository<Game> gameRepository, IRepository<Admin> adminRepository, IRepository<Discount> discountRepository, IRepository<User> userRepository, IRepository<Developer> developerRepository) {
         this.gameRepository = gameRepository;
         this.adminRepository = adminRepository;
         this.discountRepository = discountRepository;
+        this.userRepository = userRepository;
+        this.developerRepository = developerRepository;
     }
 
     /**
@@ -81,6 +86,43 @@ public class AdminService {
         float discountedPrice = game.getPrice() * (1 - discountPercentage / 100);
         System.out.println("Discount of " + discountPercentage + "% applied to game: " + game.getGameName());
         System.out.println("New discounted price: " + discountedPrice);
+    }
+
+    public boolean deleteAnyAccount(String email) {
+        User userToDelete = null;
+
+        List<Admin> admins = adminRepository.getAll();
+        for (Admin admin : admins) {
+            if (admin.getEmail().equalsIgnoreCase(email)) {
+                userToDelete = admin;
+                adminRepository.delete(admin.getId());
+                return true;
+            }
+        }
+
+        List<Developer> developers = developerRepository.getAll();
+        for (Developer developer : developers) {
+            if (developer.getEmail().equalsIgnoreCase(email)) {
+                userToDelete = developer;
+                developerRepository.delete(developer.getId());
+                return true;
+            }
+        }
+
+        List<User> users = userRepository.getAll();
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                userToDelete = user;
+                userRepository.delete(user.getId());
+                return true;
+            }
+        }
+
+        if (userToDelete == null) {
+            throw new BusinessLogicException("User with the given email does not exist.");
+        }
+
+        return false;
     }
 
     /**

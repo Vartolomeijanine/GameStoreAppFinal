@@ -5,6 +5,8 @@ import Controller.GameController;
 import Model.Developer;
 import Model.Game;
 import Model.GameGenre;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class DeveloperMenu {
@@ -27,8 +29,10 @@ public class DeveloperMenu {
             System.out.println("2. View Game by ID");
             System.out.println("3. Publish Game");
             System.out.println("4. Modify Game");
-            System.out.println("5. Log Out");
-            System.out.println("6. Exit");
+            System.out.println("5. View Published Games");
+            System.out.println("6. Delete Account");
+            System.out.println("7. Log Out");
+            System.out.println("8. Exit");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -38,8 +42,10 @@ public class DeveloperMenu {
                 case 2 -> mainMenu.handleViewGame(gameController);
                 case 3 -> handlePublishGame();
                 case 4 -> handleModifyGame();
-                case 5 -> mainMenu.handleLogOut();
-                case 6 -> System.exit(0);
+                case 5 -> handleViewPublishedGames();
+                case 6 -> {mainMenu.handleDeleteAccount(); return;}
+                case 7 -> {mainMenu.handleLogOut(); return;}
+                case 8 -> System.exit(0);
                 default -> System.out.println("Invalid option. Try again.");
             }
         }
@@ -78,4 +84,22 @@ public class DeveloperMenu {
         developerController.modifyGame(gameId, name, description, genre, price);
         System.out.println("Game modified successfully.");
     }
+
+    private void handleViewPublishedGames() {
+        try {
+            List<Game> publishedGames = developerController.getPublishedGames();
+            if (publishedGames.isEmpty()) {
+                System.out.println("No games have been published yet.");
+            } else {
+                System.out.println("Published Games:");
+                for (Game game : publishedGames) {
+                    System.out.println(game);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+
 }
