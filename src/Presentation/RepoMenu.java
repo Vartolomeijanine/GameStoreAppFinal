@@ -54,27 +54,31 @@ public class RepoMenu {
         IRepository<Game> gameRepository = new InMemoryRepository<>();
         IRepository<User> userRepository = new InMemoryRepository<>();
         IRepository<Admin> adminRepository = new InMemoryRepository<>();
-        System.out.println("Initializing Admin Repository...");
         IRepository<Developer> developerRepository = new InMemoryRepository<>();
         IRepository<Discount> discountRepository = new InMemoryRepository<>();
+        IRepository<Customer> customerRepository = new InMemoryRepository<>();
+        IRepository<Review> reviewRepository = new InMemoryRepository<>();
+        IRepository<PaymentMethod> paymentMethodRepository = new InMemoryRepository<>();
 
         // Initialize services
         // Initialize services pentru InMemory
-        AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository);
+        AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository, customerRepository);
         GameService gameService = new GameService(gameRepository);
-        AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository);
+        AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository, customerRepository);
         DeveloperService developerService = new DeveloperService(gameRepository, developerRepository);
+        CustomerService customerService = new CustomerService(gameRepository, userRepository, customerRepository, reviewRepository, paymentMethodRepository);
 
         // Initialize controllers
         AccountController accountController = new AccountController(accountService);
         GameController gameController = new GameController(gameService);
         AdminController adminController = new AdminController(adminService);
         DeveloperController developerController = new DeveloperController(developerService);
+        CustomerController customerController = new CustomerController(customerService);
 
         initializeGames(gameRepository);
 
         // Start main menu
-        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController);
+        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController);
         mainMenu.start();
     }
 
