@@ -16,6 +16,7 @@ public class AdminService {
     private final IRepository<Discount> discountRepository;
     private final IRepository<User> userRepository;
     private final IRepository<Developer> developerRepository;
+    private final IRepository<Customer> customerRepository;
     private Admin loggedInAdmin;
 
     /**
@@ -25,12 +26,13 @@ public class AdminService {
      * @param adminRepository The repository for managing admins.
      * @param discountRepository The repository for managing discounts.
      */
-    public AdminService(IRepository<Game> gameRepository, IRepository<Admin> adminRepository, IRepository<Discount> discountRepository, IRepository<User> userRepository, IRepository<Developer> developerRepository) {
+    public AdminService(IRepository<Game> gameRepository, IRepository<Admin> adminRepository, IRepository<Discount> discountRepository, IRepository<User> userRepository, IRepository<Developer> developerRepository, IRepository<Customer> customerRepository) {
         this.gameRepository = gameRepository;
         this.adminRepository = adminRepository;
         this.discountRepository = discountRepository;
         this.userRepository = userRepository;
         this.developerRepository = developerRepository;
+        this.customerRepository = customerRepository;
     }
 
     /**
@@ -58,7 +60,6 @@ public class AdminService {
             throw new BusinessLogicException("Game with ID " + gameId + " not found.");
         }
         gameRepository.delete(gameId);
-        //System.out.println("Game with ID " + gameId + " has been successfully deleted.");
     }
 
     /**
@@ -106,6 +107,26 @@ public class AdminService {
                 userToDelete = developer;
                 developerRepository.delete(developer.getId());
                 return true;
+            }
+        }
+        if (customerRepository != null) {
+            List<Customer> customers = customerRepository.getAll();
+            for (Customer customer : customers) {
+                if (customer.getEmail().equalsIgnoreCase(email)) {
+                    userToDelete = customer;
+                    ShoppingCart shoppingCart = customer.getShoppingCart();
+                    if (shoppingCart != null) {
+                        shoppingCart.getListOfGames().clear();
+                    }
+                    if (customer.getReviews() != null) {
+                        customer.getReviews().clear();
+                    }
+                    if (customer.getGamesLibrary() != null) {
+                        customer.getGamesLibrary().clear();
+                    }
+                    customerRepository.delete(customer.getId());
+                    return true;
+                }
             }
         }
 

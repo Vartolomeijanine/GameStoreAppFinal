@@ -14,14 +14,16 @@ public class MainMenu {
     private final GameController gameController;
     private final AdminController adminController;
     private final DeveloperController developerController;
+    private final CustomerController customerController;
     private final Scanner scanner = new Scanner(System.in);
 
     public MainMenu(AccountController accountController, GameController gameController,
-                    AdminController adminController, DeveloperController developerController) {
+                    AdminController adminController, DeveloperController developerController, CustomerController customerController) {
         this.accountController = accountController;
         this.gameController = gameController;
         this.adminController = adminController;
         this.developerController = developerController;
+        this.customerController = customerController;
     }
 
     public void start() {

@@ -17,42 +17,19 @@ public class AccountService {
     private final IRepository<User> userRepository; //ambele
     private final IRepository<Admin> adminRepository;
     private final  IRepository<Developer> developerRepository;
-    //private final IRepository<Customer> customerRepository;
+    private final IRepository<Customer> customerRepository;
     private User loggedInUser;
 
     /**
      * Constructs the AccountService with a user repository.
      * @param userRepository The repository for storing and retrieving users.
      */
-//cea finala
-//    public AccountService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IRepository<Developer> developerRepository, IRepository<Customer> customerRepository) {
-//
-//        this.userRepository = userRepository; //ambele
-//        this.adminRepository = adminRepository;
-//        this.developerRepository = developerRepository;
-//        this.customerRepository = customerRepository;
-//    }
 
-    // Constructor pentru InMemory
-//    public AccountService(IRepository<User> userRepository) {
-//        this.userRepository = userRepository;
-//        this.adminRepository = null;
-//        this.developerRepository = null;
-//        // this.customerRepository = null;
-//    }
-//
-//    // Constructor pentru File și Database
-//    public AccountService(IRepository<Admin> adminRepository, IRepository<Developer> developerRepository /*, IRepository<Customer> customerRepository */) {
-//        this.userRepository = null; // Nu este utilizat în File/Database
-//        this.adminRepository = adminRepository;
-//        this.developerRepository = developerRepository;
-//        // this.customerRepository = customerRepository;
-//    }
-
-    public AccountService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IRepository<Developer> developerRepository) {
+    public AccountService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IRepository<Developer> developerRepository, IRepository<Customer> customerRepository) {
         this.userRepository = userRepository;
         this.adminRepository = adminRepository != null ? adminRepository : new InMemoryRepository<>();
         this.developerRepository = developerRepository != null ? developerRepository : new InMemoryRepository<>();
+        this.customerRepository = customerRepository;
     }
 
     /**
@@ -69,7 +46,7 @@ public class AccountService {
         }
 
         String role = determineRoleByEmail(email);
-        int userId; // ID-ul va fi calculat în funcție de tipul repository-ului
+        int userId;
 
         User newUser;
         switch (role) {
@@ -82,8 +59,7 @@ public class AccountService {
                     userRepository.create(newUser);
                 }
                 break;
-            default:
-            //case "Developer":
+            case "Developer":
                 userId = (developerRepository != null ? developerRepository.getAll().size() : userRepository.getAll().size()) + 1;
                 newUser = new Developer(userId, username, email, password, role, new ArrayList<>());
                 if (developerRepository != null) { // Pentru File/DB
@@ -93,11 +69,11 @@ public class AccountService {
                 }
                 break;
 
-//            default: // Dacă este alt rol (de exemplu, Customer)
-//                userId = userRepository.getAll().size() + 1;
-//                newUser = new User(userId, username, email, password, role);
-//                userRepository.create(newUser); // UserRepo este folosit în toate cazurile pentru User
-//                break;
+            default:
+                userId = (customerRepository != null ? customerRepository.getAll().size() : userRepository.getAll().size()) + 1;
+                newUser = new Customer(userId, username, email, password, "Customer", 0.0f, new ArrayList<>(), new ArrayList<>(), null);
+                userRepository.create(newUser); // UserRepo este folosit în toate cazurile pentru User
+                break;
         }
 
         return true;
@@ -129,11 +105,11 @@ public class AccountService {
                     maxId = Math.max(maxId, developer.getId());
                 }
                 break;
-//            case "Customer":
-//                for (Customer customer : customerRepository.getAll()) {
-//                    maxId = Math.max(maxId, customer.getId());
-//                }
-//                break;
+            case "Customer":
+                for (Customer customer : customerRepository.getAll()) {
+                    maxId = Math.max(maxId, customer.getId());
+                }
+                break;
         }
         return maxId + 1; // Returnăm următorul ID disponibil
     }
@@ -146,32 +122,6 @@ public class AccountService {
      * @return true if login is successful, false otherwise.
      */
 
-//OLD
-//    public boolean logIn(String email, String password) {
-//        for (User u : userRepository.getAll()) {
-//            if (u.getEmail().equals(email) && u.getPassword().equals(password)) {
-//                loggedInUser = u;
-//                System.out.println("Successful authentication for user: " + loggedInUser.getUsername());
-//                return true;
-//            }
-//        }
-//        throw new BusinessLogicException("Wrong email or password.");
-//    }
-
-//NEW 1
-//    public boolean logIn(String email, String password) {
-//        List<User> users = getAllUsers();
-//        for (User u : users) {
-//            if (u.getEmail().equals(email) && u.getPassword().equals(password)) {
-//                loggedInUser = u;
-//                System.out.println("Successful authentication for user: " + loggedInUser.getUsername());
-//                return true;
-//            }
-//        }
-//        throw new BusinessLogicException("Wrong email or password.");
-//    }
-
-//new 2
     public boolean logIn(String email, String password) {
         List<User> users = new ArrayList<>(userRepository.getAll());
 
@@ -181,6 +131,10 @@ public class AccountService {
         }
         if (developerRepository != null) {
             users.addAll(developerRepository.getAll());
+        }
+
+        if (customerRepository != null) {
+            users.addAll(customerRepository.getAll());
         }
 
         for (User u : users) {
@@ -216,9 +170,9 @@ public class AccountService {
             allUsers.addAll(developerRepository.getAll());
         }
 
-//        if (customerRepository != null) { // Pentru File/Database
-//            allUsers.addAll(customerRepository.getAll());
-//        }
+        if (customerRepository != null) { // Pentru File/Database
+            allUsers.addAll(customerRepository.getAll());
+        }
 
         return allUsers;
     }
@@ -245,12 +199,6 @@ public class AccountService {
      */
 
     private boolean isEmailUsed(String email) {
-//        for (User user : userRepository.getAll()) {
-//            if (user.getEmail().equals(email)) {
-//                return true;
-//            }
-//        }
-//        return false;
 
         if (userRepository != null) { // Pentru InMemoryRepository
             for (User user : userRepository.getAll()) {
@@ -269,12 +217,12 @@ public class AccountService {
                     return true;
                 }
             }
-            // Dacă vei adăuga un `CustomerRepository`, include și asta:
-            // for (Customer customer : customerRepository.getAll()) {
-            //     if (customer.getEmail().equals(email)) {
-            //         return true;
-            //     }
-            // }
+
+             for (Customer customer : customerRepository.getAll()) {
+                 if (customer.getEmail().equals(email)) {
+                     return true;
+                 }
+             }
         }
         return false;
     }
@@ -300,49 +248,6 @@ public class AccountService {
      * @return true if the account was deleted, false otherwise.
      */
 
-//    public boolean deleteAccount() {
-//        if (loggedInUser != null) {
-//            userRepository.delete(loggedInUser.getId());
-//            loggedInUser = null;
-//            return true;
-//        } else {
-//            throw new BusinessLogicException("No user is logged in to delete.");
-//        }
-//    }
-//nou relativ
-//    public boolean deleteAccount() {
-//        if (loggedInUser != null) {
-//            deleteUserByRole(loggedInUser); // Ștergem utilizatorul bazat pe rolul său
-//            loggedInUser = null; // Resetăm utilizatorul logat
-//            return true;
-//        }
-//        throw new BusinessLogicException("No user is logged in to delete.");
-//    }
-//new 2
-//    public boolean deleteAccount() {
-//        if (loggedInUser != null) {
-//            switch (loggedInUser.getRole()) {
-//                case "Admin":
-//                    if (adminRepository != null) {
-//                        adminRepository.delete(loggedInUser.getId());
-//                    }
-//                    break;
-//                case "Developer":
-//                    if (developerRepository != null) {
-//                        developerRepository.delete(loggedInUser.getId());
-//                    }
-//                    break;
-//                default:
-//                    userRepository.delete(loggedInUser.getId());
-//                    break;
-//            }
-//            loggedInUser = null;
-//            return true;
-//        }
-//        throw new BusinessLogicException("No user is logged in to delete.");
-//    }
-
-//new 3
     public boolean deleteAccount() {
         if (loggedInUser != null) {
             switch (loggedInUser.getRole()) {
@@ -360,7 +265,25 @@ public class AccountService {
                         throw new BusinessLogicException("Developer repository is not initialized.");
                     }
                     break;
-                default: // For regular "User"
+                case "Customer":
+                    if (userRepository != null) {
+                        Customer customerToDelete = (Customer) loggedInUser;
+                        ShoppingCart shoppingCart = customerToDelete.getShoppingCart();
+                        if (shoppingCart != null) {
+                            shoppingCart.getListOfGames().clear();
+                        }
+                        if (customerToDelete.getReviews() != null) {
+                            customerToDelete.getReviews().clear();
+                        }
+                        if (customerToDelete.getGamesLibrary() != null) {
+                            customerToDelete.getGamesLibrary().clear();
+                        }
+                        userRepository.delete(customerToDelete.getId());
+                    } else {
+                        throw new BusinessLogicException("User repository is not initialized.");
+                    }
+                    break;
+                default:
                     if (userRepository != null) {
                         userRepository.delete(loggedInUser.getId());
                     } else {
@@ -368,42 +291,17 @@ public class AccountService {
                     }
                     break;
             }
-            loggedInUser = null; // Clear the logged-in user
+            loggedInUser = null;
             return true;
         }
         throw new BusinessLogicException("No user is logged in to delete.");
     }
-
-
-
-
-
-
 
     /**
      * Deletes any user account by email (admin-only function).
      * @param email The email of the account to delete.
      * @return true if the account was deleted, false otherwise.
      */
-
-//    public boolean deleteAnyAccount(String email) {
-//
-//        List<User> users = userRepository.getAll();
-//        User userToDelete = null;
-//
-//        for (User user : users) {
-//            if (user.getEmail().equalsIgnoreCase(email)) {
-//                userToDelete = user;
-//                break;
-//            }
-//        }
-//        if (userToDelete == null) {
-//            throw new BusinessLogicException("User with the given email does not exist.");
-//        }
-//
-//        userRepository.delete(userToDelete.getId());
-//        return true;
-//    }
 
     public boolean deleteAnyAccount(String email) {
         User userToDelete = null;
@@ -418,7 +316,7 @@ public class AccountService {
             throw new BusinessLogicException("User with the given email does not exist.");
         }
 
-        deleteUserByRole(userToDelete); // Ștergem utilizatorul bazat pe rolul său
+        deleteUserByRole(userToDelete);
         return true;
     }
 
@@ -432,7 +330,6 @@ public class AccountService {
             throw new BusinessLogicException("User is null. Cannot delete.");
         }
 
-        // Determine the user's role and delete from the appropriate repository
         switch (user.getRole()) {
             case "Admin" -> {
                 adminRepository.delete(user.getId());
@@ -440,9 +337,9 @@ public class AccountService {
             case "Developer" -> {
                 developerRepository.delete(user.getId());
             }
-//            case "Customer" -> {
-//                customerRepository.delete(user.getId());
-//            }
+            case "Customer" -> {
+                customerRepository.delete(user.getId());
+            }
             default -> throw new BusinessLogicException("Invalid user role: " + user.getRole());
         }
 
