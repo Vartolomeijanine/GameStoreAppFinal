@@ -53,26 +53,29 @@ public class AccountService {
             case "Admin":
                 userId = (adminRepository != null ? adminRepository.getAll().size() : userRepository.getAll().size()) + 1;
                 newUser = new Admin(userId, username, email, password, role);
-                if (adminRepository != null) { // Pentru File/DB
+                if (adminRepository != null) {
                     adminRepository.create((Admin) newUser);
-                } else { // Pentru InMemory
+                } else {
                     userRepository.create(newUser);
                 }
                 break;
             case "Developer":
                 userId = (developerRepository != null ? developerRepository.getAll().size() : userRepository.getAll().size()) + 1;
                 newUser = new Developer(userId, username, email, password, role, new ArrayList<>());
-                if (developerRepository != null) { // Pentru File/DB
+                if (developerRepository != null) {
                     developerRepository.create((Developer) newUser);
-                } else { // Pentru InMemory
+                } else {
                     userRepository.create(newUser);
                 }
                 break;
 
+            case "Customer":
             default:
-                userId = (customerRepository != null ? customerRepository.getAll().size() : userRepository.getAll().size()) + 1;
-                newUser = new Customer(userId, username, email, password, "Customer", 0.0f, new ArrayList<>(), new ArrayList<>(), null);
-                userRepository.create(newUser); // UserRepo este folosit în toate cazurile pentru User
+                userId = userRepository.getAll().size() + 1;
+                Customer customer = new Customer(userId, username, email, password, role, 0.0f, new ArrayList<>(), new ArrayList<>(), null);
+                ShoppingCart shoppingCart = new ShoppingCart(customer.getId(), customer, new ArrayList<>());
+                customer.setShoppingCart(shoppingCart);
+                userRepository.create(customer);
                 break;
         }
 
