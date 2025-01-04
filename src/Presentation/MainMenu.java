@@ -1,10 +1,7 @@
 package Presentation;
 
 import Controller.*;
-import Model.Admin;
-import Model.Developer;
-import Model.Game;
-import Model.User;
+import Model.*;
 
 import java.util.List;
 import java.util.Scanner;
@@ -78,6 +75,10 @@ public class MainMenu {
                 Developer loggedInDeveloper = (Developer) loggedInUser;
                 DeveloperMenu developerMenu = new DeveloperMenu(developerController, gameController, this, loggedInDeveloper); // Aici creezi DeveloperMenu
                 developerMenu.start();
+            } else if ("Customer".equals(loggedInUser.getRole())) {
+                Customer loggedInCustomer = (Customer) loggedInUser;
+                CustomerMenu customerMenu = new CustomerMenu(customerController, gameController, this, loggedInCustomer);
+                customerMenu.start();
             } else {
                 System.out.println("Unknown role. Returning to Main Menu.");
             }
