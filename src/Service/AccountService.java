@@ -72,10 +72,10 @@ public class AccountService {
             case "Customer":
             default:
                 userId = userRepository.getAll().size() + 1;
-                Customer customer = new Customer(userId, username, email, password, role, 0.0f, new ArrayList<>(), new ArrayList<>(), null);
-                ShoppingCart shoppingCart = new ShoppingCart(customer.getId(), customer, new ArrayList<>());
-                customer.setShoppingCart(shoppingCart);
-                userRepository.create(customer);
+                Customer newCustomer = new Customer(userId, username, email, password, role, 0.0f, new ArrayList<>(), new ArrayList<>(), null);
+                ShoppingCart shoppingCart = new ShoppingCart(userId, newCustomer);
+                newCustomer.setShoppingCart(shoppingCart);
+                userRepository.create(newCustomer);
                 break;
         }
 

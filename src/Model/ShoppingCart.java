@@ -1,44 +1,45 @@
 package Model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShoppingCart implements HasId ,Serializable {
-    private Integer shoppingCartId;
+/**
+ * Represents a Shopping Cart for a Customer, which can also act as an Order in the database.
+ */
+public class ShoppingCart implements HasId {
+    private int shoppingCartId;
     private List<Game> listOfGames;
     private Customer customer;
+    private String status; // "ACTIVE", "CHECKED_OUT", etc.
 
     /**
-     * Constructs a shopping cart for the specified customer and game list.
+     * Constructs a ShoppingCart with the specified details.
      *
      * @param shoppingCartId The unique identifier for the shopping cart.
-     * @param customer       The customer who owns the cart.
-     * @param listOfGames    The list of games in the cart.
+     * @param customer       The customer owning the shopping cart.
      */
-    public ShoppingCart(Integer shoppingCartId, Customer customer, List<Game> listOfGames) {
-        if (customer == null) {
-            throw new IllegalArgumentException("Customer cannot be null.");
-        }
+    public ShoppingCart(int shoppingCartId, Customer customer) {
         this.shoppingCartId = shoppingCartId;
         this.customer = customer;
-        this.listOfGames = listOfGames != null ? new ArrayList<>(listOfGames) : new ArrayList<>();
+        this.listOfGames = new ArrayList<>();
+        this.status = "ACTIVE";
     }
 
-    public Integer getShoppingCartId() {
+    // Getters and Setters
+    public int getShoppingCartId() {
         return shoppingCartId;
     }
 
-    public void setShoppingCartId(Integer shoppingCartId) {
+    public void setShoppingCartId(int shoppingCartId) {
         this.shoppingCartId = shoppingCartId;
     }
 
     public List<Game> getListOfGames() {
-        return new ArrayList<>(listOfGames); // Return a copy to ensure encapsulation
+        return listOfGames;
     }
 
     public void setListOfGames(List<Game> listOfGames) {
-        this.listOfGames = listOfGames != null ? new ArrayList<>(listOfGames) : new ArrayList<>();
+        this.listOfGames = listOfGames;
     }
 
     public Customer getCustomer() {
@@ -46,11 +47,17 @@ public class ShoppingCart implements HasId ,Serializable {
     }
 
     public void setCustomer(Customer customer) {
-        if (customer == null) {
-            throw new IllegalArgumentException("Customer cannot be null.");
-        }
         this.customer = customer;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
     @Override
     public String toString() {
@@ -58,6 +65,7 @@ public class ShoppingCart implements HasId ,Serializable {
                 "shoppingCartId=" + shoppingCartId +
                 ", listOfGames=" + listOfGames +
                 ", customer=" + (customer != null ? customer.getUsername() : "unknown") +
+                ", status='" + status + '\'' +
                 '}';
     }
 

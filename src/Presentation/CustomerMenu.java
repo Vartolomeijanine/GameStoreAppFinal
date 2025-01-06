@@ -2,10 +2,12 @@ package Presentation;
 
 import Controller.CustomerController;
 import Controller.GameController;
+import Controller.ShoppingCartController;
 import Model.Customer;
 import Model.Game;
 import Exception.EntityNotFoundException;
 import Exception.ValidationException;
+import Model.ShoppingCart;
 
 import java.util.Scanner;
 import java.util.List;
@@ -13,13 +15,15 @@ import java.util.List;
 public class CustomerMenu {
     private final CustomerController customerController;
     private final GameController gameController;
+    private final ShoppingCartController shoppingCartController;
     private final MainMenu mainMenu;
     private final Scanner scanner = new Scanner(System.in);
 
-    public CustomerMenu(CustomerController customerController, GameController gameController, MainMenu mainMenu, Customer loggedInCustomer) {
+    public CustomerMenu(CustomerController customerController, GameController gameController, MainMenu mainMenu, Customer loggedInCustomer, ShoppingCartController shoppingCartController) {
         this.customerController = customerController;
         this.gameController = gameController;
         this.mainMenu = mainMenu;
+        this.shoppingCartController = shoppingCartController;
         this.customerController.setLoggedInCustomer(loggedInCustomer);
     }
 
@@ -135,7 +139,6 @@ public class CustomerMenu {
     }
 
     private void handleCheckout() {
-        
     }
 
     private void handleViewCartTotalPrice() {
@@ -151,6 +154,19 @@ public class CustomerMenu {
     }
 
     private void handleListAllGames() {
+        try {
+            List<Game> allGames = shoppingCartController.getAllGames();
+            if (allGames.isEmpty()) {
+                System.out.println("No games available.");
+            } else {
+                System.out.println("Available Games:");
+                for (Game game : allGames) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
     }
 
 
