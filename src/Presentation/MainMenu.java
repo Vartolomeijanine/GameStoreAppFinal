@@ -12,15 +12,17 @@ public class MainMenu {
     private final AdminController adminController;
     private final DeveloperController developerController;
     private final CustomerController customerController;
+    private final ShoppingCartController shoppingCartController;
     private final Scanner scanner = new Scanner(System.in);
 
     public MainMenu(AccountController accountController, GameController gameController,
-                    AdminController adminController, DeveloperController developerController, CustomerController customerController) {
+                    AdminController adminController, DeveloperController developerController, CustomerController customerController, ShoppingCartController shoppingCartController) {
         this.accountController = accountController;
         this.gameController = gameController;
         this.adminController = adminController;
         this.developerController = developerController;
         this.customerController = customerController;
+        this.shoppingCartController = shoppingCartController;
     }
 
     public void start() {
@@ -77,7 +79,7 @@ public class MainMenu {
                 developerMenu.start();
             } else if ("Customer".equals(loggedInUser.getRole())) {
                 Customer loggedInCustomer = (Customer) loggedInUser;
-                CustomerMenu customerMenu = new CustomerMenu(customerController, gameController, this, loggedInCustomer);
+                CustomerMenu customerMenu = new CustomerMenu(customerController, gameController, this, loggedInCustomer, shoppingCartController);
                 customerMenu.start();
             } else {
                 System.out.println("Unknown role. Returning to Main Menu.");

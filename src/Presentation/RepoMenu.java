@@ -59,6 +59,7 @@ public class RepoMenu {
         IRepository<Customer> customerRepository = new InMemoryRepository<>();
         IRepository<Review> reviewRepository = new InMemoryRepository<>();
         IRepository<PaymentMethod> paymentMethodRepository = new InMemoryRepository<>();
+        IRepository<ShoppingCart> shoppingCartRepository = new InMemoryRepository<>();
 
         // Initialize services
         // Initialize services pentru InMemory
@@ -67,6 +68,7 @@ public class RepoMenu {
         AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository, customerRepository);
         DeveloperService developerService = new DeveloperService(gameRepository, developerRepository);
         CustomerService customerService = new CustomerService(gameRepository, userRepository, customerRepository, reviewRepository, paymentMethodRepository);
+        ShoppingCartService shoppingCartService = new ShoppingCartService(shoppingCartRepository, gameRepository);
 
         // Initialize controllers
         AccountController accountController = new AccountController(accountService);
@@ -74,11 +76,12 @@ public class RepoMenu {
         AdminController adminController = new AdminController(adminService);
         DeveloperController developerController = new DeveloperController(developerService);
         CustomerController customerController = new CustomerController(customerService);
+        ShoppingCartController shoppingCartController = new ShoppingCartController(shoppingCartService);
 
         initializeGames(gameRepository);
 
         // Start main menu
-        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController);
+        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController, shoppingCartController);
         mainMenu.start();
     }
 
