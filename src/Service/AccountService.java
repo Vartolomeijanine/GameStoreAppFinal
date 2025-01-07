@@ -72,13 +72,18 @@ public class AccountService {
                 break;
 
             case "Customer":
-            default:
-                userId = userRepository.getAll().size() + 1;
+                userId = (customerRepository != null ? customerRepository.getAll().size() : userRepository.getAll().size()) + 1;
                 Customer newCustomer = new Customer(userId, username, email, password, role, 0.0f, new ArrayList<>(), new ArrayList<>(), null);
                 ShoppingCart shoppingCart = new ShoppingCart(userId, newCustomer);
                 newCustomer.setShoppingCart(shoppingCart);
-                shoppingCartRepository.create(shoppingCart);
-                userRepository.create(newCustomer);
+
+                if (customerRepository != null) {
+                    customerRepository.create(newCustomer);
+                    shoppingCartRepository.create(shoppingCart);
+                } else {
+                    userRepository.create(newCustomer);
+                    shoppingCartRepository.create(shoppingCart);
+                }
                 break;
         }
 
@@ -269,11 +274,12 @@ public class AccountService {
                     }
                     break;
                 case "Customer":
-                    if (userRepository != null) {
+                    if (customerRepository != null) {
                         Customer customerToDelete = (Customer) loggedInUser;
                         ShoppingCart shoppingCart = customerToDelete.getShoppingCart();
                         if (shoppingCart != null) {
-                            shoppingCart.getListOfGames().clear();
+                            //shoppingCart.getListOfGames().clear();
+                            shoppingCartRepository.delete(shoppingCart.getId());
                         }
                         if (customerToDelete.getReviews() != null) {
                             customerToDelete.getReviews().clear();
@@ -281,7 +287,7 @@ public class AccountService {
                         if (customerToDelete.getGamesLibrary() != null) {
                             customerToDelete.getGamesLibrary().clear();
                         }
-                        userRepository.delete(customerToDelete.getId());
+                        customerRepository.delete(customerToDelete.getId());
                     } else {
                         throw new BusinessLogicException("User repository is not initialized.");
                     }

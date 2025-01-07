@@ -114,6 +114,11 @@ public class CustomerService {
         }
 
         loggedInCustomer.setFundWallet(loggedInCustomer.getFundWallet() + amount);
+        if (customerRepository != null) {
+            customerRepository.update(loggedInCustomer);
+        } else {
+            throw new BusinessLogicException("Customer repository is not available.");
+        }
         System.out.println("Funds added via " + paymentMethod + ". New balance: $" + loggedInCustomer.getFundWallet());
     }
 
