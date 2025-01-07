@@ -62,7 +62,7 @@ public class DeveloperMenu {
         float price = scanner.nextFloat();
         scanner.nextLine();
 
-        Game game = new Game(null, name, description, GameGenre.valueOf(genre), price/* , null */);
+        Game game = new Game(null, name, description, GameGenre.valueOf(genre), price , null);
         developerController.publishGame(game);
         System.out.println("Game published successfully.");
     }

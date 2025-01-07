@@ -26,13 +26,11 @@ public class GameService {
      * @param game The game to add.
      */
     public void addGame(Game game) {
-        // Generate the next unique ID if the game ID is not already set
         if (game.getId() == null) {
             Integer nextId = generateNextId();
             game.setGameId(nextId);
         }
 
-        // Check for duplicate game names
         List<Game> allGames = gameRepository.getAll();
         for (Game existingGame : allGames) {
             if (existingGame.getGameName().equalsIgnoreCase(game.getGameName())) {
@@ -83,12 +81,10 @@ public class GameService {
     private Integer generateNextId() {
         List<Game> allGames = gameRepository.getAll();
 
-        // If no games exist, the first ID is 1
         if (allGames.isEmpty()) {
             return 1;
         }
 
-        // Find the maximum ID in the existing games and increment it
         Integer maxId = allGames.stream()
                 .map(Game::getId)
                 .max(Integer::compareTo)

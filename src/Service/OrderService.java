@@ -1,8 +1,10 @@
 package Service;
 
+import Model.Customer;
 import Model.Order;
 import Repository.IRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderService {
@@ -20,15 +22,26 @@ public class OrderService {
         return orderRepository.getAll();
     }
 
+    public List<Order> getAllOrdersByCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer is not logged in.");
+        }
+
+        List<Order> customerOrders = new ArrayList<>();
+        for (Order order : orderRepository.getAll()) {
+            if (order.getCustomer().getId().equals(customer.getId())) {
+                customerOrders.add(order);
+            }
+        }
+
+        return customerOrders;
+    }
+
     public Order getOrderById(int orderId) {
         Order order = orderRepository.get(orderId);
         if (order == null) {
             throw new IllegalArgumentException("Order not found.");
         }
         return order;
-    }
-
-    public void deleteOrder(int orderId) {
-        orderRepository.delete(orderId);
     }
 }
