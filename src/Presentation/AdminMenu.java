@@ -29,7 +29,7 @@ public class AdminMenu {
             System.out.println("5. Delete Account");
             System.out.println("6. Delete Any Account by Email");
             System.out.println("7. Log Out");
-            System.out.println("8. Exit");
+            System.out.println("8. Exit\n");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -48,6 +48,7 @@ public class AdminMenu {
         }
     }
 
+    //3
 
     private void handleDeleteGame() {
         System.out.print("Enter Game ID to delete: ");
@@ -58,6 +59,8 @@ public class AdminMenu {
 
     }
 
+    //4
+
     private void handleApplyDiscount() {
         System.out.print("Enter Game ID: ");
         int gameId = scanner.nextInt();
@@ -67,6 +70,8 @@ public class AdminMenu {
         adminController.applyDiscountToGame(gameId, discount);
         System.out.println("Discount applied successfully.");
     }
+
+    //5
 
     private void handleDeleteAnyAccount() {
         System.out.print("Enter the email of the account to delete: ");

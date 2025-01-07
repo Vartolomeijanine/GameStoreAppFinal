@@ -42,6 +42,10 @@ public class ShoppingCartService {
             throw new IllegalArgumentException("The game is already in your library.");
         }
 
+        if (cart.getListOfGames().stream().anyMatch(game -> game.getGameId() == gameId)) {
+            throw new IllegalArgumentException("The game is already in your cart.");
+        }
+
         if ("CHECKED_OUT".equals(cart.getStatus())) {
             cart.setStatus("ACTIVE");
             cart.getListOfGames().clear();

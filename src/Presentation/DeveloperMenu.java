@@ -32,7 +32,7 @@ public class DeveloperMenu {
             System.out.println("5. View Published Games");
             System.out.println("6. Delete Account");
             System.out.println("7. Log Out");
-            System.out.println("8. Exit");
+            System.out.println("8. Exit\n");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -51,6 +51,8 @@ public class DeveloperMenu {
         }
     }
 
+    //3
+
     private void handlePublishGame() {
         System.out.print("Enter Game Name: ");
         String name = scanner.nextLine();
@@ -67,6 +69,8 @@ public class DeveloperMenu {
         System.out.println("Game published successfully.");
     }
 
+    //4
+
     private void handleModifyGame() {
         System.out.print("Enter Game ID: ");
         int gameId = scanner.nextInt();
@@ -82,8 +86,9 @@ public class DeveloperMenu {
         scanner.nextLine();
 
         developerController.modifyGame(gameId, name, description, genre, price);
-        System.out.println("Game modified successfully.");
     }
+
+    //5
 
     private void handleViewPublishedGames() {
         try {

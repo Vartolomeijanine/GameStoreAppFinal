@@ -37,7 +37,7 @@ public class Game implements HasId, Serializable {
         this.gameDescription = gameDescription;
         this.gameGenre = gameGenre;
         this.price = price;
-        this.reviews = new ArrayList<>(reviews);
+        this.reviews = (reviews != null) ? new ArrayList<>(reviews) : new ArrayList<>();
     }
 
     public Integer getGameId() {
@@ -101,18 +101,6 @@ public class Game implements HasId, Serializable {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews != null ? new ArrayList<>(reviews) : new ArrayList<>();
-    }
-
-    public String getFormattedReviews() {
-        if (reviews.isEmpty()) {
-            return "No reviews yet.";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Review review : reviews) {
-            sb.append("- ").append(review.getRating()).append("/5 by ")
-                    .append(review.getCustomer().getUsername()).append("\n");
-        }
-        return sb.toString();
     }
 
 
