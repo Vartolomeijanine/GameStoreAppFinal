@@ -60,15 +60,19 @@ public class RepoMenu {
         IRepository<Review> reviewRepository = new InMemoryRepository<>();
         IRepository<PaymentMethod> paymentMethodRepository = new InMemoryRepository<>();
         IRepository<ShoppingCart> shoppingCartRepository = new InMemoryRepository<>();
+        IRepository<Order> orderRepository = new InMemoryRepository<>();
+
 
         // Initialize services
         // Initialize services pentru InMemory
-        AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository, customerRepository);
+        AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository, customerRepository, shoppingCartRepository);
         GameService gameService = new GameService(gameRepository);
         AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository, customerRepository);
         DeveloperService developerService = new DeveloperService(gameRepository, developerRepository);
         CustomerService customerService = new CustomerService(gameRepository, userRepository, customerRepository, reviewRepository, paymentMethodRepository);
-        ShoppingCartService shoppingCartService = new ShoppingCartService(shoppingCartRepository, gameRepository);
+        ShoppingCartService shoppingCartService = new ShoppingCartService(shoppingCartRepository, gameRepository, orderRepository, customerRepository);
+        OrderService orderService = new OrderService(orderRepository);
+
 
         // Initialize controllers
         AccountController accountController = new AccountController(accountService);

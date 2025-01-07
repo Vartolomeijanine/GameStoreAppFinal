@@ -58,6 +58,13 @@ public class ShoppingCart implements HasId {
         this.status = status;
     }
 
+//    public boolean isCheckedOut() {
+//        return "CHECKED_OUT".equals(status);
+//    }
+
+    public void clear() {
+        this.listOfGames.clear();
+    }
 
     @Override
     public String toString() {

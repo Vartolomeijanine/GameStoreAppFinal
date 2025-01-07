@@ -18,6 +18,7 @@ public class AccountService {
     private final IRepository<Admin> adminRepository;
     private final  IRepository<Developer> developerRepository;
     private final IRepository<Customer> customerRepository;
+    private final IRepository<ShoppingCart> shoppingCartRepository;
     private User loggedInUser;
 
     /**
@@ -25,11 +26,12 @@ public class AccountService {
      * @param userRepository The repository for storing and retrieving users.
      */
 
-    public AccountService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IRepository<Developer> developerRepository, IRepository<Customer> customerRepository) {
+    public AccountService(IRepository<User> userRepository, IRepository<Admin> adminRepository, IRepository<Developer> developerRepository, IRepository<Customer> customerRepository, IRepository<ShoppingCart> shoppingCartRepository) {
         this.userRepository = userRepository;
         this.adminRepository = adminRepository != null ? adminRepository : new InMemoryRepository<>();
         this.developerRepository = developerRepository != null ? developerRepository : new InMemoryRepository<>();
         this.customerRepository = customerRepository;
+        this.shoppingCartRepository = shoppingCartRepository;
     }
 
     /**
@@ -75,6 +77,7 @@ public class AccountService {
                 Customer newCustomer = new Customer(userId, username, email, password, role, 0.0f, new ArrayList<>(), new ArrayList<>(), null);
                 ShoppingCart shoppingCart = new ShoppingCart(userId, newCustomer);
                 newCustomer.setShoppingCart(shoppingCart);
+                shoppingCartRepository.create(shoppingCart);
                 userRepository.create(newCustomer);
                 break;
         }
@@ -91,11 +94,9 @@ public class AccountService {
      */
     private int generateUniqueUserId(String role) {
         if (userRepository != null) {
-            // Cazul InMemory: folosim userRepository pentru a calcula ID-ul
             return userRepository.getAll().stream().mapToInt(User::getId).max().orElse(0) + 1;
         }
 
-        // Cazurile File și Database: calculăm ID-ul pentru fiecare tip de utilizator
         int maxId = 0;
         switch (role) {
             case "Admin":
@@ -114,7 +115,7 @@ public class AccountService {
                 }
                 break;
         }
-        return maxId + 1; // Returnăm următorul ID disponibil
+        return maxId + 1;
     }
 
 
@@ -128,7 +129,6 @@ public class AccountService {
     public boolean logIn(String email, String password) {
         List<User> users = new ArrayList<>(userRepository.getAll());
 
-        // Pentru File/DB, verificăm repository-urile specifice
         if (adminRepository != null) {
             users.addAll(adminRepository.getAll());
         }
@@ -161,19 +161,19 @@ public class AccountService {
     private List<User> getAllUsers() {
         List<User> allUsers = new ArrayList<>();
 
-        if (userRepository != null) { // Pentru InMemory
+        if (userRepository != null) {
             allUsers.addAll(userRepository.getAll());
         }
 
-        if (adminRepository != null) { // Pentru File/Database
+        if (adminRepository != null) {
             allUsers.addAll(adminRepository.getAll());
         }
 
-        if (developerRepository != null) { // Pentru File/Database
+        if (developerRepository != null) {
             allUsers.addAll(developerRepository.getAll());
         }
 
-        if (customerRepository != null) { // Pentru File/Database
+        if (customerRepository != null) {
             allUsers.addAll(customerRepository.getAll());
         }
 
@@ -203,13 +203,13 @@ public class AccountService {
 
     private boolean isEmailUsed(String email) {
 
-        if (userRepository != null) { // Pentru InMemoryRepository
+        if (userRepository != null) {
             for (User user : userRepository.getAll()) {
                 if (user.getEmail().equals(email)) {
                     return true;
                 }
             }
-        } else { // Pentru FileRepository sau DatabaseRepository
+        } else {
             for (Admin admin : adminRepository.getAll()) {
                 if (admin.getEmail().equals(email)) {
                     return true;
@@ -346,7 +346,6 @@ public class AccountService {
             default -> throw new BusinessLogicException("Invalid user role: " + user.getRole());
         }
 
-        // If we are using InMemory, also delete from userRepository
         if (userRepository != null) {
             userRepository.delete(user.getId());
         }
