@@ -7,6 +7,7 @@ import Model.Customer;
 import Model.Game;
 import Exception.EntityNotFoundException;
 import Exception.ValidationException;
+import Model.Order;
 import Model.ShoppingCart;
 
 import java.util.Scanner;
@@ -40,7 +41,8 @@ public class CustomerMenu {
             System.out.println("8. Add Review to a game");
             System.out.println("9. Delete Account");
             System.out.println("10. Log Out");
-            System.out.println("11. Exit");
+            System.out.println("11. View Order History");
+            System.out.println("12. Exit");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -55,7 +57,8 @@ public class CustomerMenu {
                 case 7 -> handleShoppingCartMenu();
                 case 9 -> {mainMenu.handleDeleteAccount(); return;}
                 case 10 -> {mainMenu.handleLogOut(); return;}
-                case 11 -> mainMenu.exitApp();
+                case 11 -> handleViewOrderHistory();
+                case 12 -> mainMenu.exitApp();
                 default -> System.out.println("Invalid option. Try again.");
             }
         }
@@ -139,18 +142,81 @@ public class CustomerMenu {
     }
 
     private void handleCheckout() {
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+            shoppingCartController.checkout(shoppingCartId);
+            System.out.println("Checkout completed successfully!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void handleViewCartTotalPrice() {
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+
+            float totalPrice = shoppingCartController.getCartTotalPrice(shoppingCartId);
+
+            System.out.println("Total price of the games in your cart: $" + totalPrice);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
     private void handleRemoveGameFromCart() {
+        System.out.print("Enter the ID of the game to remove from your cart: ");
+        int gameId = scanner.nextInt();
+        scanner.nextLine(); // Consumăm newline-ul rămas
+
+        try {
+            int shoppingCartId = customerController.getShoppingCartId(); // Obține ID-ul coșului de cumpărături
+            shoppingCartController.removeGameFromCart(shoppingCartId, gameId);
+            System.out.println("Game successfully removed from your cart!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
     private void handleAddGameToCart() {
+        System.out.print("Enter the ID of the game to add to your cart: ");
+        int gameId = scanner.nextInt();
+        scanner.nextLine(); // Consumăm newline-ul rămas
+
+        try {
+            int shoppingCartId = customerController.getShoppingCartId(); // Obține ID-ul coșului de cumpărături
+            shoppingCartController.addGameToCart(shoppingCartId, gameId);
+            System.out.println("Game successfully added to your cart!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+
     }
 
     private void handleViewCart() {
+        try {
+            int shoppingCartId = customerController.getShoppingCartId(); // Obține ID-ul coșului de cumpărături
+            ShoppingCart cart = shoppingCartController.getShoppingCart(shoppingCartId);
+            List<Game> gamesInCart = cart.getListOfGames();
+
+            if (gamesInCart.isEmpty()) {
+                System.out.println("Your cart is empty.");
+            } else {
+                System.out.println("Games in your cart:");
+                for (Game game : gamesInCart) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
     private void handleListAllGames() {
@@ -291,6 +357,29 @@ public class CustomerMenu {
             System.out.println("An error occurred while fetching your games library: " + e.getMessage());
         }
     }
+
+    private void handleViewOrderHistory() {
+        try {
+            List<Order> orders = shoppingCartController.getOrderHistory(); // Obține istoricul comenzilor
+            if (orders.isEmpty()) {
+                System.out.println("You have not placed any orders yet.");
+                return;
+            }
+
+            System.out.println("Your Order History:");
+            for (Order order : orders) {
+                System.out.println("Order ID: " + order.getOrderId());
+                System.out.println("Games:");
+                for (Game game : order.getPurchasedGames()) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred while fetching your order history: " + e.getMessage());
+        }
+    }
+
 
 
 }

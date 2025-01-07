@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.Game;
+import Model.Order;
 import Model.ShoppingCart;
 import Service.ShoppingCartService;
 
@@ -36,4 +37,17 @@ public class ShoppingCartController {
     public void checkout(int shoppingCartId) {
         shoppingCartService.checkout(shoppingCartId);
     }
+
+    public void clearCart(int shoppingCartId) {
+        shoppingCartService.clearCart(shoppingCartId);
+    }
+
+    public void resetCartForCustomer(int shoppingCartId) {
+        shoppingCartService.resetCartForCustomer(shoppingCartId);
+    }
+
+    public List<Order> getOrderHistory() {
+        return shoppingCartService.getOrderHistory();
+    }
+
 }

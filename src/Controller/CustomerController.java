@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Customer;
 import Model.Game;
+import Model.ShoppingCart;
 import Service.CustomerService;
 
 import java.util.List;
@@ -49,6 +50,15 @@ public class CustomerController {
     public List<Game> viewGamesLibrary() {
         return customerService.viewGamesLibrary();
     }
+
+    public int getShoppingCartId() {
+        return customerService.getShoppingCartId();
+    }
+
+    public ShoppingCart getShoppingCart() {
+        return customerService.getLoggedInCustomer().getShoppingCart();
+    }
+
 
 
 }

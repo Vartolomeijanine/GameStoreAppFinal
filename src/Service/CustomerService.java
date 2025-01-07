@@ -36,7 +36,7 @@ public class CustomerService {
     public List<Game> searchGameByName(String name) {
         List<Game> matchingGames = new ArrayList<>();
         if (loggedInCustomer != null) {
-            List<Game> allGames = gameRepository.getAll(); // Presupunem că ai un gameRepository accesibil în CustomerService
+            List<Game> allGames = gameRepository.getAll();
             for (Game game : allGames) {
                 if (game.getGameName().toLowerCase().contains(name.toLowerCase())) {
                     matchingGames.add(game);
@@ -136,6 +136,17 @@ public class CustomerService {
         }
 
         return gamesLibrary;
+    }
+
+    public int getShoppingCartId() {
+        Customer loggedInCustomer = getLoggedInCustomer();
+        if (loggedInCustomer == null) {
+            throw new IllegalStateException("No customer is logged in.");
+        }
+        if (loggedInCustomer.getShoppingCart() == null) {
+            throw new IllegalStateException("Logged-in customer does not have a shopping cart.");
+        }
+        return loggedInCustomer.getShoppingCart().getShoppingCartId();
     }
 
 
