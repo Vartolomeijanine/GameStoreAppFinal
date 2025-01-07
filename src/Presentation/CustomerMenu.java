@@ -33,6 +33,8 @@ public class CustomerMenu {
         this.reviewController.setLoggedInCustomer(loggedInCustomer);
     }
 
+    //MENUS
+
     public void start() {
         while (true) {
             System.out.println("\nCustomer Menu:");
@@ -41,16 +43,13 @@ public class CustomerMenu {
             System.out.println("3. Sort/Filter Games by");
             System.out.println("4. Add Funds to your Wallet");
             System.out.println("5. View Wallet Balance");
-            System.out.println("6. View Games Library");
+            System.out.println("6. Game Library Options");
             System.out.println("7. Make a Purchase");
-            System.out.println("8. Add Review to a game");
-            System.out.println("9. View Reviews for a Game");
-            System.out.println("10. View All Reviews");
-            System.out.println("11. Delete Account");
-            System.out.println("12. View Order History");
-            System.out.println("13. View my Own Orders");
-            System.out.println("14. Log Out");
-            System.out.println("15. Exit");
+            System.out.println("8. View Order History");
+            System.out.println("9. View my Own Orders");
+            System.out.println("10. Delete Account");
+            System.out.println("11. Log Out");
+            System.out.println("12. Exit\n");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -61,26 +60,137 @@ public class CustomerMenu {
                 case 3 -> handleSortFilterGames();
                 case 4 -> handleAddFundsToWallet();
                 case 5 -> handleViewWalletBalance();
-                case 6 -> handleViewGamesLibrary();
+                case 6 -> handleGameLibraryOptionsMenu();
                 case 7 -> handleShoppingCartMenu();
-                case 8 -> handleLeaveReview();
-                case 9 -> handleViewReviewsForGame();
-                case 10 -> handleViewAllReviews();
-                case 11 -> {
+                case 8 -> handleViewOrderHistory();
+                case 9 -> handleViewCustomerOrderHistory();
+                case 10 -> {
                     mainMenu.handleDeleteAccount();
                     return;
                 }
-                case 12 -> handleViewOrderHistory();
-                case 13 -> handleViewCustomerOrderHistory();
-                case 14 -> {
+                case 11 -> {
                     mainMenu.handleLogOut();
                     return;
                 }
-                case 15 -> mainMenu.exitApp();
+                case 12 -> mainMenu.exitApp();
                 default -> System.out.println("Invalid option. Try again.");
             }
         }
     }
+
+
+    private void handleSortFilterGames() {
+        while (true) {
+            System.out.println("\nSort/Filter Games Menu:");
+            System.out.println("1. Sort Games by Name (Ascending)");
+            System.out.println("2. Sort Games by Price (Descending)");
+            System.out.println("3. Filter Games by Genre");
+            System.out.println("4. Filter Games by Price Range");
+            System.out.println("5. Return to Customer Menu\n");
+            System.out.print("Select option: ");
+
+            int option = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (option) {
+                case 1 -> handleSortGamesByNameAscending();
+                case 2 -> handleSortGamesByPriceDescending();
+                case 3 -> handleFilterByGenre();
+                case 4 -> handleFilterGamesByPriceRange();
+                case 5 -> {
+                    System.out.println("Returning to Customer Menu...");
+                    return;
+                }
+                default -> System.out.println("Invalid option. Try again.");
+            }
+        }
+    }
+
+
+    private void handleGameLibraryOptionsMenu() {
+        handleViewGamesLibrary();
+
+        while (true) {
+            System.out.println("\nGame Library Options:");
+            System.out.println("1. Add Review to a Game");
+            System.out.println("2. View Reviews for a Game");
+            System.out.println("3. View All Reviews");
+            System.out.println("4. Return to Customer Menu\n");
+            System.out.print("Select option: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1 ->{
+                    handleLeaveReview();
+                    handleViewGamesLibrary();
+                }
+                case 2 -> {
+                    handleViewReviewsForGame();
+                    handleViewGamesLibrary();
+                }
+                case 3 -> handleViewAllReviews();
+                case 4 -> {return;}
+                default -> System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+
+    private void handleShoppingCartMenu() {
+        while (true) {
+            System.out.println("\nShopping Cart Menu:");
+            System.out.println("1. List All Games");
+            System.out.println("2. View Cart");
+            System.out.println("3. Add Game to Cart");
+            System.out.println("4. Remove Game from Cart");
+            System.out.println("5. View Cart Total Price");
+            System.out.println("6. Checkout");
+            System.out.println("7. Return to Customer Menu\n");
+            System.out.print("Select option: ");
+
+            int option = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (option) {
+                case 1 -> handleListAllGames();
+                case 2 -> handleViewCart();
+                case 3 -> handleAddGameToCart();
+                case 4 -> handleRemoveGameFromCart();
+                case 5 -> handleViewCartTotalPrice();
+                case 6 -> {
+                    handleCheckout();
+                    return;
+                }
+                case 7 -> {
+                    System.out.println("Returning to Customer Menu...");
+                    return;
+                }
+                default -> System.out.println("Invalid option. Try again.");
+            }
+        }
+    }
+
+    //1
+
+    private void handleListAllGames() {
+        try {
+            List<Game> allGames = shoppingCartController.getAllGames();
+            if (allGames.isEmpty()) {
+                System.out.println("No games available.");
+            } else {
+                System.out.println("Available Games:");
+                for (Game game : allGames) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+    //2
 
     private void handleSearchGameByName() {
         System.out.print("Enter the game name or a part of it: ");
@@ -119,158 +229,7 @@ public class CustomerMenu {
 
     }
 
-    private void handleSortFilterGames() {
-        while (true) {
-            System.out.println("\nSort/Filter Games Menu:");
-            System.out.println("1. Sort Games by Name (Ascending)");
-            System.out.println("2. Sort Games by Price (Descending)");
-            System.out.println("3. Filter Games by Genre");
-            System.out.println("4. Filter Games by Price Range");
-            System.out.println("5. Return to Customer Menu");
-            System.out.print("Select option: ");
-
-            int option = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (option) {
-                case 1 -> handleSortGamesByNameAscending();
-                case 2 -> handleSortGamesByPriceDescending();
-                case 3 -> handleFilterByGenre();
-                case 4 -> handleFilterGamesByPriceRange();
-                case 5 -> {
-                    System.out.println("Returning to Customer Menu...");
-                    return;
-                }
-                default -> System.out.println("Invalid option. Try again.");
-            }
-        }
-    }
-
-    private void handleShoppingCartMenu() {
-        while (true) {
-            System.out.println("\nShopping Cart Menu:");
-            System.out.println("1. List All Games");
-            System.out.println("2. View Cart");
-            System.out.println("3. Add Game to Cart");
-            System.out.println("4. Remove Game from Cart");
-            System.out.println("5. View Cart Total Price");
-            System.out.println("6. Checkout");
-            System.out.println("7. Return to Customer Menu");
-            System.out.print("Select option: ");
-
-            int option = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (option) {
-                case 1 -> handleListAllGames();
-                case 2 -> handleViewCart();
-                case 3 -> handleAddGameToCart();
-                case 4 -> handleRemoveGameFromCart();
-                case 5 -> handleViewCartTotalPrice();
-                case 6 -> handleCheckout();
-                case 7 -> {
-                    System.out.println("Returning to Customer Menu...");
-                    return;
-                }
-                default -> System.out.println("Invalid option. Try again.");
-            }
-        }
-    }
-
-    private void handleCheckout() {
-        try {
-            int shoppingCartId = customerController.getShoppingCartId();
-            shoppingCartController.checkout(shoppingCartId);
-            System.out.println("Checkout completed successfully!");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-    private void handleViewCartTotalPrice() {
-        try {
-            int shoppingCartId = customerController.getShoppingCartId();
-
-            float totalPrice = shoppingCartController.getCartTotalPrice(shoppingCartId);
-
-            System.out.println("Total price of the games in your cart: $" + totalPrice);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-        }
-    }
-
-    private void handleRemoveGameFromCart() {
-        System.out.print("Enter the ID of the game to remove from your cart: ");
-        int gameId = scanner.nextInt();
-        scanner.nextLine();
-
-        try {
-            int shoppingCartId = customerController.getShoppingCartId();
-            shoppingCartController.removeGameFromCart(shoppingCartId, gameId);
-            System.out.println("Game successfully removed from your cart!");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-        }
-    }
-
-    private void handleAddGameToCart() {
-        System.out.print("Enter the ID of the game to add to your cart: ");
-        int gameId = scanner.nextInt();
-        scanner.nextLine();
-
-        try {
-            int shoppingCartId = customerController.getShoppingCartId();
-            shoppingCartController.addGameToCart(shoppingCartId, gameId);
-            System.out.println("Game successfully added to your cart!");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-        }
-
-    }
-
-    private void handleViewCart() {
-        try {
-            int shoppingCartId = customerController.getShoppingCartId();
-            ShoppingCart cart = shoppingCartController.getShoppingCart(shoppingCartId);
-            List<Game> gamesInCart = cart.getListOfGames();
-
-            if (gamesInCart.isEmpty()) {
-                System.out.println("Your cart is empty.");
-            } else {
-                System.out.println("Games in your cart:");
-                for (Game game : gamesInCart) {
-                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
-                }
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-        }
-    }
-
-    private void handleListAllGames() {
-        try {
-            List<Game> allGames = shoppingCartController.getAllGames();
-            if (allGames.isEmpty()) {
-                System.out.println("No games available.");
-            } else {
-                System.out.println("Available Games:");
-                for (Game game : allGames) {
-                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("An error occurred: " + e.getMessage());
-        }
-    }
-
+    //3.1
 
     private void handleSortGamesByNameAscending() {
         try {
@@ -289,6 +248,8 @@ public class CustomerMenu {
         }
     }
 
+    //3.2
+
     private void handleSortGamesByPriceDescending() {
         try {
             List<Game> sortedGames = customerController.sortGamesByPriceDescending();
@@ -305,6 +266,8 @@ public class CustomerMenu {
             System.out.println("Error: " + ex.getMessage());
         }
     }
+
+    //3.3
 
     private void handleFilterByGenre() {
         try {
@@ -327,6 +290,8 @@ public class CustomerMenu {
             System.out.println("Error: " + ex.getMessage());
         }
     }
+
+    //3.4
 
     private void handleFilterGamesByPriceRange() {
         try {
@@ -355,6 +320,8 @@ public class CustomerMenu {
         }
     }
 
+    //4
+
     private void handleAddFundsToWallet() {
         System.out.print("Enter payment method (e.g., Visa, AppleCard): ");
         String paymentMethod = scanner.nextLine();
@@ -370,6 +337,7 @@ public class CustomerMenu {
         }
     }
 
+    //5
 
     private void handleViewWalletBalance() {
         try {
@@ -380,13 +348,15 @@ public class CustomerMenu {
         }
     }
 
+    //6
+
     private void handleViewGamesLibrary() {
         try {
             List<Game> gamesLibrary = customerController.viewGamesLibrary();
             if (gamesLibrary.isEmpty()) {
-                System.out.println("Your games library is empty.");
+                System.out.println("Your Game Library is empty.");
             } else {
-                System.out.println("Your Games Library:");
+                System.out.println("Your Game Library:");
                 for (Game game : gamesLibrary) {
                     StringBuilder gameDetails = new StringBuilder();
                     gameDetails.append("Game ID: ").append(game.getGameId()).append(", ")
@@ -408,33 +378,11 @@ public class CustomerMenu {
                 }
             }
         } catch (Exception e) {
-            System.out.println("An error occurred while fetching your games library: " + e.getMessage());
-        }
-
-
-    }
-
-    private void handleViewOrderHistory() {
-        try {
-            List<Order> orders = shoppingCartController.getOrderHistory();
-            if (orders.isEmpty()) {
-                System.out.println("You have not placed any orders yet.");
-                return;
-            }
-
-            System.out.println("Your Order History:");
-            for (Order order : orders) {
-                System.out.println("Order ID: " + order.getOrderId());
-                System.out.println("Games:");
-                for (Game game : order.getPurchasedGames()) {
-                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
-                }
-                System.out.println();
-            }
-        } catch (Exception e) {
-            System.out.println("An error occurred while fetching your order history: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
+
+    //6.1
 
     private void handleLeaveReview() {
         try {
@@ -446,13 +394,15 @@ public class CustomerMenu {
             scanner.nextLine();
 
             reviewController.leaveReview(gameId, rating);
-            System.out.println("Review successfully added!");
+            System.out.println("Review successfully added!\n");
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
+
+    //6.2
 
     private void handleViewReviewsForGame() {
         try {
@@ -476,6 +426,8 @@ public class CustomerMenu {
         }
     }
 
+    //6.3
+
     private void handleViewAllReviews() {
         try {
             List<Review> allReviews = reviewController.getAllReviews();
@@ -491,6 +443,119 @@ public class CustomerMenu {
             System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
+
+    //7.2
+
+    private void handleViewCart() {
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+            ShoppingCart cart = shoppingCartController.getShoppingCart(shoppingCartId);
+            List<Game> gamesInCart = cart.getListOfGames();
+
+            if (gamesInCart.isEmpty()) {
+                System.out.println("Your cart is empty.");
+            } else {
+                System.out.println("Games in your cart:");
+                for (Game game : gamesInCart) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    //7.3
+
+    private void handleAddGameToCart() {
+        System.out.print("Enter the ID of the game to add to your cart: ");
+        int gameId = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+            shoppingCartController.addGameToCart(shoppingCartId, gameId);
+            System.out.println("Game successfully added to your cart!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    //7.4
+
+    private void handleRemoveGameFromCart() {
+        System.out.print("Enter the ID of the game to remove from your cart: ");
+        int gameId = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+            shoppingCartController.removeGameFromCart(shoppingCartId, gameId);
+            System.out.println("Game successfully removed from your cart!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    //7.5
+
+    private void handleViewCartTotalPrice() {
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+
+            float totalPrice = shoppingCartController.getCartTotalPrice(shoppingCartId);
+
+            System.out.println("Total price of the games in your cart: $" + totalPrice);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    //7.6
+
+    private void handleCheckout() {
+        try {
+            int shoppingCartId = customerController.getShoppingCartId();
+            shoppingCartController.checkout(shoppingCartId);
+            System.out.println("Checkout completed successfully!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    //8
+
+    private void handleViewOrderHistory() {
+        try {
+            List<Order> orders = shoppingCartController.getOrderHistory();
+            if (orders.isEmpty()) {
+                System.out.println("You have not placed any orders yet.");
+                return;
+            }
+
+            System.out.println("Your Order History:");
+            for (Order order : orders) {
+                System.out.println("Order ID: " + order.getOrderId());
+                System.out.println("Games:");
+                for (Game game : order.getPurchasedGames()) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred while fetching your order history: " + e.getMessage());
+        }
+    }
+
+    //9
 
     private void handleViewCustomerOrderHistory() {
         try {
@@ -518,5 +583,4 @@ public class CustomerMenu {
             System.out.println("An error occurred while fetching the customer's order history: " + e.getMessage());
         }
     }
-
 }

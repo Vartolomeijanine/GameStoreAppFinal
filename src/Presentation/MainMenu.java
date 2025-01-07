@@ -32,7 +32,7 @@ public class MainMenu {
             System.out.println("\nMain Menu:");
             System.out.println("1. Sign Up");
             System.out.println("2. Log In");
-            System.out.println("3. Exit");
+            System.out.println("3. Exit\n");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
