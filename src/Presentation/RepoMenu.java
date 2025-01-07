@@ -1,6 +1,7 @@
 package Presentation;
 
 import Controller.*;
+import Repository.FileRepository;
 import Repository.InMemoryRepository;
 import Repository.IRepository;
 import Service.*;
@@ -16,7 +17,7 @@ public class RepoMenu {
     public void start() {
         System.out.println("Select Repository Type:");
         System.out.println("1. In-Memory");
-        System.out.println("2. File (Not Implemented)");
+        System.out.println("2. File");
         System.out.println("3. Database (Not Implemented)");
         System.out.print("Your choice: ");
         int choice = scanner.nextInt();
@@ -24,7 +25,7 @@ public class RepoMenu {
 
         switch (choice) {
             case 1 -> initializeInMemory();
-            case 2 -> System.out.println("File repository not implemented yet.");
+            case 2 -> initializeInFile();
             case 3 -> System.out.println("Database repository not implemented yet.");
             default -> {
                 System.out.println("Invalid choice. Exiting...");
@@ -50,7 +51,6 @@ public class RepoMenu {
     }
 
     private void initializeInMemory() {
-        // Initialize repositories
         IRepository<Game> gameRepository = new InMemoryRepository<>();
         IRepository<User> userRepository = new InMemoryRepository<>();
         IRepository<Admin> adminRepository = new InMemoryRepository<>();
@@ -63,7 +63,6 @@ public class RepoMenu {
         IRepository<Order> orderRepository = new InMemoryRepository<>();
 
 
-        // Initialize services
         AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository, customerRepository, shoppingCartRepository);
         GameService gameService = new GameService(gameRepository);
         AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository, customerRepository);
@@ -74,7 +73,6 @@ public class RepoMenu {
         ReviewService reviewService = new ReviewService(reviewRepository, customerRepository, gameRepository);
 
 
-        // Initialize controllers
         AccountController accountController = new AccountController(accountService);
         GameController gameController = new GameController(gameService);
         AdminController adminController = new AdminController(adminService);
@@ -85,7 +83,43 @@ public class RepoMenu {
 
         initializeGames(gameRepository);
 
-        // Start main menu
+        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController, shoppingCartController, reviewController);
+        mainMenu.start();
+    }
+
+    private void initializeInFile() {
+        IRepository<Game> gameRepository = new FileRepository<>("games.dat");
+        IRepository<User> userRepository = new FileRepository<>("users.dat");
+        IRepository<Admin> adminRepository = new FileRepository<>("admins.dat");
+        IRepository<Developer> developerRepository = new FileRepository<>("developers.dat");
+        IRepository<Discount> discountRepository = new FileRepository<>("discounts.dat");
+        IRepository<Customer> customerRepository = new FileRepository<>("customers.dat");
+        IRepository<Review> reviewRepository = new FileRepository<>("reviews.dat");
+        IRepository<PaymentMethod> paymentMethodRepository = new FileRepository<>("paymentMethods.dat");
+        IRepository<ShoppingCart> shoppingCartRepository = new FileRepository<>("shoppingCarts.dat");
+        IRepository<Order> orderRepository = new FileRepository<>("orders.dat");
+
+
+        AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository, customerRepository, shoppingCartRepository);
+        GameService gameService = new GameService(gameRepository);
+        AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository, customerRepository);
+        DeveloperService developerService = new DeveloperService(gameRepository, developerRepository);
+        CustomerService customerService = new CustomerService(gameRepository, userRepository, customerRepository, reviewRepository, paymentMethodRepository);
+        ShoppingCartService shoppingCartService = new ShoppingCartService(shoppingCartRepository, gameRepository, orderRepository, customerRepository);
+        OrderService orderService = new OrderService(orderRepository);
+        ReviewService reviewService = new ReviewService(reviewRepository, customerRepository, gameRepository);
+
+
+        AccountController accountController = new AccountController(accountService);
+        GameController gameController = new GameController(gameService);
+        AdminController adminController = new AdminController(adminService);
+        DeveloperController developerController = new DeveloperController(developerService);
+        CustomerController customerController = new CustomerController(customerService);
+        ShoppingCartController shoppingCartController = new ShoppingCartController(shoppingCartService, orderService);
+        ReviewController reviewController = new ReviewController(reviewService);
+
+        initializeGames(gameRepository);
+
         MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController, shoppingCartController, reviewController);
         mainMenu.start();
     }

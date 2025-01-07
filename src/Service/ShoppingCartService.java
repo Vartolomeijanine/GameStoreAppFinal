@@ -5,6 +5,7 @@ import Model.Game;
 import Model.Order;
 import Model.ShoppingCart;
 import Repository.IRepository;
+import Exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,16 +86,25 @@ public class ShoppingCartService {
     public void checkout(int shoppingCartId) {
 
         ShoppingCart cart = getShoppingCart(shoppingCartId);
+
+        if (cart == null) {
+            throw new IllegalArgumentException("Shopping cart not found.");
+        }
+
         if (cart.getListOfGames().isEmpty()) {
             throw new IllegalArgumentException("Your cart is empty.");
         }
 
-        Customer customer = cart.getCustomer();
+        Customer customer = customerRepository.get(cart.getCustomer().getId());
         if (customer == null) {
-            throw new IllegalStateException("No customer associated with this shopping cart.");
+            throw new EntityNotFoundException("No customer associated with this shopping cart.");
         }
 
-        float totalPrice = getCartTotalPrice(shoppingCartId);
+        //float totalPrice = getCartTotalPrice(shoppingCartId);
+        float totalPrice = 0.0f;
+        for (Game game : cart.getListOfGames()) {
+            totalPrice += game.getDiscountedPrice();
+        }
 
         if (customer.getFundWallet() < totalPrice) {
             throw new IllegalArgumentException("Insufficient funds in your wallet.");
@@ -103,16 +113,20 @@ public class ShoppingCartService {
         customer.setFundWallet(customer.getFundWallet() - totalPrice);
 
         List<Game> gamesInCart = new ArrayList<>(cart.getListOfGames());
+        customer.getGamesLibrary().addAll(gamesInCart);
 
         Order order = new Order(generateOrderId(), customer, gamesInCart);
         orderRepository.create(order);
 
-        customer.getGamesLibrary().addAll(gamesInCart);
+        //customer.getGamesLibrary().addAll(gamesInCart);
 
         cart.getListOfGames().clear();
         cart.setStatus("CHECKED_OUT");
-        shoppingCartRepository.update(cart);
         customerRepository.update(customer);
+        shoppingCartRepository.update(cart);
+
+        System.out.println("Checkout completed successfully!");
+
     }
 
 
