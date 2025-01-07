@@ -35,11 +35,11 @@ public class RepoMenu {
 
     private void initializeGames(IRepository<Game> gameRepository) {
         List<Game> sampleGames = List.of(
-                new Game(1, "Cyber Adventure", "Explore a cyberpunk city filled with secrets.", GameGenre.ADVENTURE, 59.99f/*, new ArrayList<>() */),
-                new Game(2, "Space Warfare", "A space-themed shooter with intergalactic battles.", GameGenre.SHOOTER, 49.99f/*, new ArrayList<>() */),
-                new Game(3, "Mystic Quest", "Solve mysteries in a fantasy world.", GameGenre.RPG, 39.99f/*, new ArrayList<>() */),
-                new Game(4, "Farm Builder", "Create and manage your own virtual farm.", GameGenre.RPG, 19.99f/*, new ArrayList<>() */),
-                new Game(5, "Puzzle Challenge", "Solve various puzzles to progress through levels.", GameGenre.PUZZLE, 9.99f/*, new ArrayList<>() */)
+                new Game(1, "Cyber Adventure", "Explore a cyberpunk city filled with secrets.", GameGenre.ADVENTURE, 59.99f, new ArrayList<>()),
+                new Game(2, "Space Warfare", "A space-themed shooter with intergalactic battles.", GameGenre.SHOOTER, 49.99f, new ArrayList<>()),
+                new Game(3, "Mystic Quest", "Solve mysteries in a fantasy world.", GameGenre.RPG, 39.99f, new ArrayList<>()),
+                new Game(4, "Farm Builder", "Create and manage your own virtual farm.", GameGenre.RPG, 19.99f, new ArrayList<>()),
+                new Game(5, "Puzzle Challenge", "Solve various puzzles to progress through levels.", GameGenre.PUZZLE, 9.99f, new ArrayList<>())
         );
 
         for (Game game : sampleGames) {
@@ -64,7 +64,6 @@ public class RepoMenu {
 
 
         // Initialize services
-        // Initialize services pentru InMemory
         AccountService accountService = new AccountService(userRepository, adminRepository, developerRepository, customerRepository, shoppingCartRepository);
         GameService gameService = new GameService(gameRepository);
         AdminService adminService = new AdminService(gameRepository, adminRepository, discountRepository, userRepository, developerRepository, customerRepository);
@@ -72,6 +71,7 @@ public class RepoMenu {
         CustomerService customerService = new CustomerService(gameRepository, userRepository, customerRepository, reviewRepository, paymentMethodRepository);
         ShoppingCartService shoppingCartService = new ShoppingCartService(shoppingCartRepository, gameRepository, orderRepository, customerRepository);
         OrderService orderService = new OrderService(orderRepository);
+        ReviewService reviewService = new ReviewService(reviewRepository, customerRepository, gameRepository);
 
 
         // Initialize controllers
@@ -80,12 +80,13 @@ public class RepoMenu {
         AdminController adminController = new AdminController(adminService);
         DeveloperController developerController = new DeveloperController(developerService);
         CustomerController customerController = new CustomerController(customerService);
-        ShoppingCartController shoppingCartController = new ShoppingCartController(shoppingCartService);
+        ShoppingCartController shoppingCartController = new ShoppingCartController(shoppingCartService, orderService);
+        ReviewController reviewController = new ReviewController(reviewService);
 
         initializeGames(gameRepository);
 
         // Start main menu
-        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController, shoppingCartController);
+        MainMenu mainMenu = new MainMenu(accountController, gameController, adminController, developerController, customerController, shoppingCartController, reviewController);
         mainMenu.start();
     }
 

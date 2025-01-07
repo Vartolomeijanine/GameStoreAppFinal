@@ -1,17 +1,21 @@
 package Controller;
 
+import Model.Customer;
 import Model.Game;
 import Model.Order;
 import Model.ShoppingCart;
+import Service.OrderService;
 import Service.ShoppingCartService;
 
 import java.util.List;
 
 public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
+    private final OrderService orderService;
 
-    public ShoppingCartController(ShoppingCartService shoppingCartService) {
+    public ShoppingCartController(ShoppingCartService shoppingCartService, OrderService orderService) {
         this.shoppingCartService = shoppingCartService;
+        this.orderService = orderService;
     }
 
     public List<Game> getAllGames() {
@@ -49,5 +53,10 @@ public class ShoppingCartController {
     public List<Order> getOrderHistory() {
         return shoppingCartService.getOrderHistory();
     }
+
+    public List<Order> getAllOrdersByCustomer(Customer customer) {
+        return orderService.getAllOrdersByCustomer(customer);
+    }
+
 
 }

@@ -13,16 +13,18 @@ public class MainMenu {
     private final DeveloperController developerController;
     private final CustomerController customerController;
     private final ShoppingCartController shoppingCartController;
+    private final ReviewController reviewController;
     private final Scanner scanner = new Scanner(System.in);
 
     public MainMenu(AccountController accountController, GameController gameController,
-                    AdminController adminController, DeveloperController developerController, CustomerController customerController, ShoppingCartController shoppingCartController) {
+                    AdminController adminController, DeveloperController developerController, CustomerController customerController, ShoppingCartController shoppingCartController, ReviewController reviewController) {
         this.accountController = accountController;
         this.gameController = gameController;
         this.adminController = adminController;
         this.developerController = developerController;
         this.customerController = customerController;
         this.shoppingCartController = shoppingCartController;
+        this.reviewController = reviewController;
     }
 
     public void start() {
@@ -71,15 +73,15 @@ public class MainMenu {
             User loggedInUser = accountController.getLoggedInUser();
             if ("Admin".equals(loggedInUser.getRole())) {
                 Admin loggedInAdmin = (Admin) loggedInUser;
-                AdminMenu adminMenu = new AdminMenu(adminController, gameController, this, loggedInAdmin); // Transmit gameController și MainMenu
+                AdminMenu adminMenu = new AdminMenu(adminController, gameController, this, loggedInAdmin);
                 adminMenu.start();
             } else if ("Developer".equals(loggedInUser.getRole())) {
                 Developer loggedInDeveloper = (Developer) loggedInUser;
-                DeveloperMenu developerMenu = new DeveloperMenu(developerController, gameController, this, loggedInDeveloper); // Aici creezi DeveloperMenu
+                DeveloperMenu developerMenu = new DeveloperMenu(developerController, gameController, this, loggedInDeveloper);
                 developerMenu.start();
             } else if ("Customer".equals(loggedInUser.getRole())) {
                 Customer loggedInCustomer = (Customer) loggedInUser;
-                CustomerMenu customerMenu = new CustomerMenu(customerController, gameController, this, loggedInCustomer, shoppingCartController);
+                CustomerMenu customerMenu = new CustomerMenu(customerController, gameController, this, loggedInCustomer, shoppingCartController, reviewController);
                 customerMenu.start();
             } else {
                 System.out.println("Unknown role. Returning to Main Menu.");
@@ -105,25 +107,46 @@ public class MainMenu {
 
     public void handleViewAllGames() {
         try {
-            List<Game> games = gameController.getAllGames();
-            if (games.isEmpty()) {
+            List<Game> allGames = gameController.getAllGames();
+            if (allGames.isEmpty()) {
                 System.out.println("No games available.");
             } else {
                 System.out.println("Available Games:");
-                for (Game game : games) {
-                    System.out.println(game);
+                for (Game game : allGames) {
+                    StringBuilder gameDetails = new StringBuilder();
+                    gameDetails.append("Game ID: ").append(game.getGameId()).append(", ")
+                            .append("Name: ").append(game.getGameName()).append(", ")
+                            .append("Description: ").append(game.getGameDescription()).append(", ")
+                            .append("Genre: ").append(game.getGameGenre()).append(", ")
+                            .append("Price: $").append(game.getDiscountedPrice()).append(", ");
+
+                    // Afișare recenzii
+                    if (!game.getReviews().isEmpty()) {
+                        gameDetails.append("Reviews: ");
+                        for (Review review : game.getReviews()) {
+                            gameDetails.append(review.getRating()).append("/5 by ")
+                                    .append(review.getCustomer().getUsername()).append("; ");
+                        }
+                    } else {
+                        gameDetails.append("Reviews: No reviews");
+                    }
+
+                    System.out.println(gameDetails.toString());
                 }
             }
         } catch (Exception e) {
-            System.out.println("An error occurred while retrieving games: " + e.getMessage());
+            System.out.println("An error occurred: " + e.getMessage());
         }
+
+
+
     }
 
     public void handleViewGame(GameController gameController) {
         try {
             System.out.print("Enter Game ID: ");
             int gameId = scanner.nextInt();
-            scanner.nextLine(); // Consumă linia rămasă
+            scanner.nextLine();
 
             Game game = gameController.getGameById(gameId);
             if (game != null) {

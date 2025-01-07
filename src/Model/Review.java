@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Review implements HasId, Serializable {
     private int reviewID;
-    private String text;
+    private int rating;
     private Customer customer;
     private Game game;
 
@@ -12,14 +12,16 @@ public class Review implements HasId, Serializable {
      * Constructs a review with the specified details.
      *
      * @param reviewID The unique identifier for the review.
-     * @param text     The text content of the review.
+     * @param rating   The numeric rating (1 to 5).
      * @param customer The customer who wrote the review.
      * @param game     The game being reviewed.
      */
-
-    public Review(int reviewID, String text, Customer customer, Game game) {
+    public Review(int reviewID, int rating, Customer customer, Game game) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
         this.reviewID = reviewID;
-        this.text = text;
+        this.rating = rating;
         this.customer = customer;
         this.game = game;
     }
@@ -32,12 +34,19 @@ public class Review implements HasId, Serializable {
         this.reviewID = reviewID;
     }
 
-    public String getText() {
-        return text;
+    public int getRating() {
+        return rating;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setRating(int rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
+        this.rating = rating;
+    }
+
+    public String getRatingAsString() {
+        return rating + "/5";
     }
 
     public Customer getCustomer() {
@@ -60,7 +69,7 @@ public class Review implements HasId, Serializable {
     public String toString() {
         return "Review{" +
                 "reviewID=" + reviewID +
-                ", text='" + text + '\'' +
+                ", rating='" + getRatingAsString() + '\'' +
                 ", customer='" + (customer != null ? customer.getUsername() : "unknown") + '\'' +
                 ", game='" + (game != null ? game.getGameName() : "unknown") + '\'' +
                 '}';

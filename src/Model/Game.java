@@ -18,7 +18,7 @@ public class Game implements HasId, Serializable {
     private GameGenre gameGenre;
     private float price;
     private Discount discount;
-    //List<Review> reviews;
+    List<Review> reviews;
 
     /**
      * Constructs a Game with the specified details.
@@ -31,24 +31,13 @@ public class Game implements HasId, Serializable {
      * //@param reviews         A list of reviews for the game.
      */
 
-//cea finala
-//    public Game(Integer gameId, String gameName, String gameDescription, GameGenre gameGenre, float price, List<Review> reviews) {
-//        this.gameId = gameId;
-//        this.gameName = gameName;
-//        this.gameDescription = gameDescription;
-//        this.gameGenre = gameGenre;
-//        this.price = price;
-//        this.reviews = new ArrayList<>(reviews);
-//    }
-
-//cea actuala pe care o modif pe parcurs
-
-    public Game(Integer gameId, String gameName, String gameDescription, GameGenre gameGenre, float price) {
+    public Game(Integer gameId, String gameName, String gameDescription, GameGenre gameGenre, float price, List<Review> reviews) {
         this.gameId = gameId;
         this.gameName = gameName;
         this.gameDescription = gameDescription;
         this.gameGenre = gameGenre;
         this.price = price;
+        this.reviews = new ArrayList<>(reviews);
     }
 
     public Integer getGameId() {
@@ -107,10 +96,25 @@ public class Game implements HasId, Serializable {
     public void setDiscount(Discount discount) {
         this.discount = discount;
     }
-//
-//    public List<Review> getReviews() {return reviews;}
-//
-//    public void setReviews(List<Review> reviews) {this.reviews = new ArrayList<>(reviews);}
+
+    public List<Review> getReviews() {return reviews;}
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews != null ? new ArrayList<>(reviews) : new ArrayList<>();
+    }
+
+    public String getFormattedReviews() {
+        if (reviews.isEmpty()) {
+            return "No reviews yet.";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Review review : reviews) {
+            sb.append("- ").append(review.getRating()).append("/5 by ")
+                    .append(review.getCustomer().getUsername()).append("\n");
+        }
+        return sb.toString();
+    }
+
 
     @Override
     public String toString() {
@@ -118,9 +122,9 @@ public class Game implements HasId, Serializable {
                 "gameId=" + gameId +
                 ", gameName='" + gameName + '\'' +
                 ", gameDescription='" + gameDescription + '\'' +
-                //", gameGenre='" + gameGenre + '\'' +
+                ", gameGenre='" + gameGenre + '\'' +
                 ", price=" + getDiscountedPrice() +
-                //", reviews=" + reviews +
+                ", reviews=" + reviews +
                 '}';
     }
 

@@ -2,9 +2,11 @@ package Presentation;
 
 import Controller.CustomerController;
 import Controller.GameController;
+import Controller.ReviewController;
 import Controller.ShoppingCartController;
 import Model.Customer;
 import Model.Game;
+import Model.Review;
 import Exception.EntityNotFoundException;
 import Exception.ValidationException;
 import Model.Order;
@@ -17,15 +19,18 @@ public class CustomerMenu {
     private final CustomerController customerController;
     private final GameController gameController;
     private final ShoppingCartController shoppingCartController;
+    private final ReviewController reviewController;
     private final MainMenu mainMenu;
     private final Scanner scanner = new Scanner(System.in);
 
-    public CustomerMenu(CustomerController customerController, GameController gameController, MainMenu mainMenu, Customer loggedInCustomer, ShoppingCartController shoppingCartController) {
+    public CustomerMenu(CustomerController customerController, GameController gameController, MainMenu mainMenu, Customer loggedInCustomer, ShoppingCartController shoppingCartController, ReviewController reviewController) {
         this.customerController = customerController;
         this.gameController = gameController;
         this.mainMenu = mainMenu;
         this.shoppingCartController = shoppingCartController;
+        this.reviewController = reviewController;
         this.customerController.setLoggedInCustomer(loggedInCustomer);
+        this.reviewController.setLoggedInCustomer(loggedInCustomer);
     }
 
     public void start() {
@@ -39,10 +44,13 @@ public class CustomerMenu {
             System.out.println("6. View Games Library");
             System.out.println("7. Make a Purchase");
             System.out.println("8. Add Review to a game");
-            System.out.println("9. Delete Account");
-            System.out.println("10. Log Out");
-            System.out.println("11. View Order History");
-            System.out.println("12. Exit");
+            System.out.println("9. View Reviews for a Game");
+            System.out.println("10. View All Reviews");
+            System.out.println("11. Delete Account");
+            System.out.println("12. View Order History");
+            System.out.println("13. View my Own Orders");
+            System.out.println("14. Log Out");
+            System.out.println("15. Exit");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -55,10 +63,20 @@ public class CustomerMenu {
                 case 5 -> handleViewWalletBalance();
                 case 6 -> handleViewGamesLibrary();
                 case 7 -> handleShoppingCartMenu();
-                case 9 -> {mainMenu.handleDeleteAccount(); return;}
-                case 10 -> {mainMenu.handleLogOut(); return;}
-                case 11 -> handleViewOrderHistory();
-                case 12 -> mainMenu.exitApp();
+                case 8 -> handleLeaveReview();
+                case 9 -> handleViewReviewsForGame();
+                case 10 -> handleViewAllReviews();
+                case 11 -> {
+                    mainMenu.handleDeleteAccount();
+                    return;
+                }
+                case 12 -> handleViewOrderHistory();
+                case 13 -> handleViewCustomerOrderHistory();
+                case 14 -> {
+                    mainMenu.handleLogOut();
+                    return;
+                }
+                case 15 -> mainMenu.exitApp();
                 default -> System.out.println("Invalid option. Try again.");
             }
         }
@@ -75,12 +93,30 @@ public class CustomerMenu {
             } else {
                 System.out.println("Games matching \"" + gameName + "\":");
                 for (Game game : matchingGames) {
-                    System.out.println(game);
+                    StringBuilder gameDetails = new StringBuilder();
+                    gameDetails.append("Game ID: ").append(game.getGameId()).append(", ")
+                            .append("Name: ").append(game.getGameName()).append(", ")
+                            .append("Description: ").append(game.getGameDescription()).append(", ")
+                            .append("Genre: ").append(game.getGameGenre()).append(", ")
+                            .append("Price: $").append(game.getDiscountedPrice()).append(", ");
+
+                    if (!game.getReviews().isEmpty()) {
+                        gameDetails.append("Reviews: ");
+                        for (Review review : game.getReviews()) {
+                            gameDetails.append(review.getRating()).append("/5 by ")
+                                    .append(review.getCustomer().getUsername()).append("; ");
+                        }
+                    } else {
+                        gameDetails.append("Reviews: No reviews");
+                    }
+
+                    System.out.println(gameDetails.toString());
                 }
             }
         } catch (Exception e) {
             System.out.println("An error occurred while searching for games: " + e.getMessage());
         }
+
     }
 
     private void handleSortFilterGames() {
@@ -168,10 +204,10 @@ public class CustomerMenu {
     private void handleRemoveGameFromCart() {
         System.out.print("Enter the ID of the game to remove from your cart: ");
         int gameId = scanner.nextInt();
-        scanner.nextLine(); // Consumăm newline-ul rămas
+        scanner.nextLine();
 
         try {
-            int shoppingCartId = customerController.getShoppingCartId(); // Obține ID-ul coșului de cumpărături
+            int shoppingCartId = customerController.getShoppingCartId();
             shoppingCartController.removeGameFromCart(shoppingCartId, gameId);
             System.out.println("Game successfully removed from your cart!");
         } catch (IllegalArgumentException e) {
@@ -184,10 +220,10 @@ public class CustomerMenu {
     private void handleAddGameToCart() {
         System.out.print("Enter the ID of the game to add to your cart: ");
         int gameId = scanner.nextInt();
-        scanner.nextLine(); // Consumăm newline-ul rămas
+        scanner.nextLine();
 
         try {
-            int shoppingCartId = customerController.getShoppingCartId(); // Obține ID-ul coșului de cumpărături
+            int shoppingCartId = customerController.getShoppingCartId();
             shoppingCartController.addGameToCart(shoppingCartId, gameId);
             System.out.println("Game successfully added to your cart!");
         } catch (IllegalArgumentException e) {
@@ -200,7 +236,7 @@ public class CustomerMenu {
 
     private void handleViewCart() {
         try {
-            int shoppingCartId = customerController.getShoppingCartId(); // Obține ID-ul coșului de cumpărături
+            int shoppingCartId = customerController.getShoppingCartId();
             ShoppingCart cart = shoppingCartController.getShoppingCart(shoppingCartId);
             List<Game> gamesInCart = cart.getListOfGames();
 
@@ -347,20 +383,40 @@ public class CustomerMenu {
     private void handleViewGamesLibrary() {
         try {
             List<Game> gamesLibrary = customerController.viewGamesLibrary();
-            System.out.println("Your Games Library:");
-            for (Game game : gamesLibrary) {
-                System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+            if (gamesLibrary.isEmpty()) {
+                System.out.println("Your games library is empty.");
+            } else {
+                System.out.println("Your Games Library:");
+                for (Game game : gamesLibrary) {
+                    StringBuilder gameDetails = new StringBuilder();
+                    gameDetails.append("Game ID: ").append(game.getGameId()).append(", ")
+                            .append("Name: ").append(game.getGameName()).append(", ")
+                            .append("Description: ").append(game.getGameDescription()).append(", ")
+                            .append("Genre: ").append(game.getGameGenre()).append(", ")
+                            .append("Price: $").append(game.getDiscountedPrice()).append(", ");
+
+                    if (!game.getReviews().isEmpty()) {
+                        gameDetails.append("Reviews: ");
+                        for (Review review : game.getReviews()) {
+                            gameDetails.append(review.getRating()).append("/5 by ")
+                                    .append(review.getCustomer().getUsername()).append("; ");
+                        }
+                    } else {
+                        gameDetails.append("Reviews: No reviews");
+                    }
+                    System.out.println(gameDetails.toString());
+                }
             }
-        } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
         } catch (Exception e) {
             System.out.println("An error occurred while fetching your games library: " + e.getMessage());
         }
+
+
     }
 
     private void handleViewOrderHistory() {
         try {
-            List<Order> orders = shoppingCartController.getOrderHistory(); // Obține istoricul comenzilor
+            List<Order> orders = shoppingCartController.getOrderHistory();
             if (orders.isEmpty()) {
                 System.out.println("You have not placed any orders yet.");
                 return;
@@ -380,6 +436,87 @@ public class CustomerMenu {
         }
     }
 
+    private void handleLeaveReview() {
+        try {
+            System.out.print("Enter the ID of the game to review: ");
+            int gameId = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter your rating (1-5): ");
+            int rating = scanner.nextInt();
+            scanner.nextLine();
 
+            reviewController.leaveReview(gameId, rating);
+            System.out.println("Review successfully added!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    private void handleViewReviewsForGame() {
+        try {
+            System.out.print("Enter the ID of the game to view reviews: ");
+            int gameId = scanner.nextInt();
+            scanner.nextLine();
+
+            List<Review> reviews = reviewController.getReviewsForGame(gameId);
+            if (reviews.isEmpty()) {
+                System.out.println("No reviews found for this game.");
+            } else {
+                System.out.println("Reviews for the game:");
+                for (Review review : reviews) {
+                    System.out.println("- " + review.getRating() + "/5 by " + review.getCustomer().getUsername());
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    private void handleViewAllReviews() {
+        try {
+            List<Review> allReviews = reviewController.getAllReviews();
+            if (allReviews.isEmpty()) {
+                System.out.println("No reviews found.");
+            } else {
+                System.out.println("All Reviews:");
+                for (Review review : allReviews) {
+                    System.out.println("- " + review.getRating() + "/5 for " + review.getGame().getGameName() + " by " + review.getCustomer().getUsername());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    private void handleViewCustomerOrderHistory() {
+        try {
+            Customer loggedInCustomer = customerController.getLoggedInCustomer();
+            if (loggedInCustomer == null) {
+                throw new IllegalStateException("No customer is currently logged in.");
+            }
+
+            List<Order> customerOrders = shoppingCartController.getAllOrdersByCustomer(loggedInCustomer);
+            if (customerOrders.isEmpty()) {
+                System.out.println("You have not placed any orders yet.");
+                return;
+            }
+
+            System.out.println("Order History for " + loggedInCustomer.getUsername() + ":");
+            for (Order order : customerOrders) {
+                System.out.println("Order ID: " + order.getOrderId());
+                System.out.println("Games:");
+                for (Game game : order.getPurchasedGames()) {
+                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
+                }
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred while fetching the customer's order history: " + e.getMessage());
+        }
+    }
 
 }

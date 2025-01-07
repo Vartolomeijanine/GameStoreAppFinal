@@ -149,7 +149,7 @@ public class ShoppingCartService {
     }
 
     private int generateShoppingCartId() {
-        return shoppingCartRepository.getAll().size() + 1; // Simplu pentru InMemory
+        return shoppingCartRepository.getAll().size() + 1;
     }
 
     public List<Order> getOrderHistory() {

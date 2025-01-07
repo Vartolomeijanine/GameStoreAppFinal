@@ -23,9 +23,5 @@ public class OrderController {
     public Order getOrderById(int orderId) {
         return orderService.getOrderById(orderId);
     }
-
-    public void deleteOrder(int orderId) {
-        orderService.deleteOrder(orderId);
-    }
 }
 

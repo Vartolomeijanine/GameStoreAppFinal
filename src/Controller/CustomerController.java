@@ -42,7 +42,6 @@ public class CustomerController {
         customerService.addFundsToWallet(paymentMethod, amount);
     }
 
-
     public float getWalletBalance() {
         return customerService.getWalletBalance();
     }
@@ -58,6 +57,11 @@ public class CustomerController {
     public ShoppingCart getShoppingCart() {
         return customerService.getLoggedInCustomer().getShoppingCart();
     }
+
+    public Customer getLoggedInCustomer() {
+        return customerService.getLoggedInCustomer();
+    }
+
 
 
 

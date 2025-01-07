@@ -46,7 +46,6 @@ public class DeveloperService {
             throw new BusinessLogicException("You are not logged in as a developer.");
         }
 
-        // Check if a game with the same name already exists
         List<Game> allGames = gameRepository.getAll();
         for (Game existingGame : allGames) {
             if (existingGame.getGameName().equalsIgnoreCase(game.getGameName())) {
@@ -54,17 +53,14 @@ public class DeveloperService {
             }
         }
 
-        // Generate the next valid ID for the game
         int nextGameId = allGames.stream()
                 .mapToInt(Game::getId)
                 .max()
                 .orElse(0) + 1;
 
-        // Set the ID and associate the game with the developer
         game.setGameId(nextGameId);
         gameRepository.create(game);
 
-        // Add the game to the developer's published games
         loggedInDeveloper.getPublishedGames().add(game);
         developerRepository.update(loggedInDeveloper);
 
@@ -91,7 +87,6 @@ public class DeveloperService {
             throw new BusinessLogicException("Game with ID " + gameId + " not found.");
         }
 
-        // Check if the logged-in developer owns the game
         boolean ownsGame = loggedInDeveloper.getPublishedGames().stream()
                 .anyMatch(g -> g.getId().equals(gameId));
 
@@ -99,12 +94,10 @@ public class DeveloperService {
             throw new BusinessLogicException("You don't have permission to modify this game.");
         }
 
-        // Modify the game details
         game.setGameName(newName);
         game.setGameDescription(newDescription);
         game.setPrice(newPrice);
 
-        // Update the game in the repository
         gameRepository.update(game);
 
         System.out.println("Game has been updated: " + game);
