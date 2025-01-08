@@ -18,7 +18,7 @@ Advanced systems for managing digital wallets and order history.
 
 Customer Features:
 
-Navigate the game catalog with filtering options by genre, name, or price.
+Navigate the game catalog with filtering options by genre and price range.
 Add games to the shopping cart and complete purchases.
 Ability to review purchased games.
 Add funds to the platform wallet through various payment methods.
@@ -39,7 +39,7 @@ Apply discounts and delete games from the catalog.
 
 Advanced Features:
 
-Advanced Sorting: Users can sort games by popularity, price, or release date.
+Advanced Sorting: Users can sort games by price and name.
 Combined Filtering: Filter options on multiple parameters simultaneously.
 Order History: Users can view details of past orders.
 Discount System: Administrators can set up promotional campaigns for games.
