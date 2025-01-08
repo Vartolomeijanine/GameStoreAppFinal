@@ -25,6 +25,9 @@ public class AdminService {
      * @param gameRepository The repository for managing games.
      * @param adminRepository The repository for managing admins.
      * @param discountRepository The repository for managing discounts.
+     * @param userRepository The repository for managing general users.
+     * @param developerRepository The repository for managing developers.
+     * @param customerRepository The repository for managing customers.
      */
     public AdminService(IRepository<Game> gameRepository, IRepository<Admin> adminRepository, IRepository<Discount> discountRepository, IRepository<User> userRepository, IRepository<Developer> developerRepository, IRepository<Customer> customerRepository) {
         this.gameRepository = gameRepository;
@@ -89,6 +92,13 @@ public class AdminService {
         System.out.println("New discounted price: " + discountedPrice);
     }
 
+    /**
+     * Deletes any user account by email.
+     *
+     * @param email The email of the account to delete.
+     * @return true if the account was deleted, false otherwise.
+     * @throws BusinessLogicException if the user with the given email does not exist.
+     */
     public boolean deleteAnyAccount(String email) {
         User userToDelete = null;
 
@@ -144,14 +154,5 @@ public class AdminService {
         }
 
         return false;
-    }
-
-    /**
-     * Retrieves the currently logged-in admin.
-     *
-     * @return The logged-in admin, or null if no admin is logged in.
-     */
-    public Admin getLoggedInAdmin() {
-        return loggedInAdmin;
     }
 }

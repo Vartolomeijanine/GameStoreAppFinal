@@ -10,10 +10,18 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The `RepoMenu` class is responsible for initializing and managing different types
+ * of repositories (In-Memory, File-based, or Database) and starting the application.
+ */
 public class RepoMenu {
 
     private final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Displays the repository selection menu and initializes the application
+     * based on the user's choice.
+     */
     public void start() {
         System.out.println("Select Repository Type:");
         System.out.println("1. In-Memory");
@@ -34,6 +42,11 @@ public class RepoMenu {
         }
     }
 
+    /**
+     * Populates the game repository with sample data.
+     *
+     * @param gameRepository The repository where sample games will be added.
+     */
     private void initializeGames(IRepository<Game> gameRepository) {
         List<Game> sampleGames = List.of(
                 new Game(1, "Cyber Adventure", "Explore a cyberpunk city filled with secrets.", GameGenre.ADVENTURE, 59.99f, new ArrayList<>()),
@@ -50,6 +63,10 @@ public class RepoMenu {
         System.out.println("Sample games have been added to the repository.");
     }
 
+    /**
+     * Initializes the application with in-memory repositories.
+     * Creates repositories, services, and controllers, and starts the main menu.
+     */
     private void initializeInMemory() {
         IRepository<Game> gameRepository = new InMemoryRepository<>();
         IRepository<User> userRepository = new InMemoryRepository<>();
@@ -87,6 +104,10 @@ public class RepoMenu {
         mainMenu.start();
     }
 
+    /**
+     * Initializes the application with file-based repositories.
+     * Creates repositories, services, and controllers, and starts the main menu.
+     */
     private void initializeInFile() {
         IRepository<Game> gameRepository = new FileRepository<>("games.dat");
         IRepository<User> userRepository = new FileRepository<>("users.dat");

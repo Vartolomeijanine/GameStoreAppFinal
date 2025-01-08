@@ -10,7 +10,6 @@ import java.util.Scanner;
 /**
  * Controller for developer actions, such as publishing and modifying games.
  */
-
 public class DeveloperController {
     private final DeveloperService developerService;
     private final Scanner scanner;
@@ -19,7 +18,6 @@ public class DeveloperController {
      * Constructs the DeveloperController with a DeveloperService instance.
      * @param developerService The DeveloperService used for developer operations.
      */
-
     public DeveloperController(DeveloperService developerService) {
         this.developerService = developerService;
         this.scanner = new Scanner(System.in);
@@ -29,7 +27,6 @@ public class DeveloperController {
      * Sets the currently logged-in developer.
      * @param developer The developer to set as logged in.
      */
-
     public void setDeveloper(Developer developer){
         this.developerService.setDeveloper(developer);
     }
@@ -38,7 +35,6 @@ public class DeveloperController {
      * Publishes a new game.
      * @param game The game to publish.
      */
-
     public void publishGame(Game game) {
         developerService.publishGame(game);
     }
@@ -51,11 +47,15 @@ public class DeveloperController {
      * @param newGenre The new genre for the game.
      * @param newPrice The new price for the game.
      */
-
     public void modifyGame(Integer gameId, String newName, String newDescription, String newGenre, Float newPrice) {
         developerService.modifyGame(gameId, newName, newDescription, newGenre, newPrice);
     }
 
+    /**
+     * Retrieves the list of games published by the currently logged-in developer.
+     *
+     * @return A list of games published by the developer.
+     */
     public List<Game> getPublishedGames() {
         return developerService.getPublishedGames();
     }

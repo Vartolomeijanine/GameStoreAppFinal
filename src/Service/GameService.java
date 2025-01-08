@@ -21,36 +21,11 @@ public class GameService {
     }
 
     /**
-     * Adds a new game to the repository, assigning it a unique ID.
-     *
-     * @param game The game to add.
-     */
-    public void addGame(Game game) {
-        if (game.getId() == null) {
-            Integer nextId = generateNextId();
-            game.setGameId(nextId);
-        }
-
-        List<Game> allGames = gameRepository.getAll();
-        for (Game existingGame : allGames) {
-            if (existingGame.getGameName().equalsIgnoreCase(game.getGameName())) {
-                throw new BusinessLogicException("A game with the name '" + game.getGameName() + "' already exists.");
-            }
-        }
-
-        try {
-            gameRepository.create(game);
-            System.out.println("Game added successfully: " + game.getGameName());
-        } catch (IllegalArgumentException e) {
-            throw new BusinessLogicException("Error while adding game: " + e.getMessage());
-        }
-    }
-
-    /**
      * Retrieves a game by its ID.
      *
      * @param gameId The ID of the game to retrieve.
-     * @return The game if found, or null otherwise.
+     * @return The game if found.
+     * @throws BusinessLogicException if the game with the specified ID is not found.
      */
     public Game getGameById(Integer gameId) {
         Game game = gameRepository.get(gameId);
@@ -64,6 +39,7 @@ public class GameService {
      * Retrieves all games from the repository.
      *
      * @return A list of all games in the repository.
+     * @throws BusinessLogicException if no games are available.
      */
     public List<Game> getAllGames() {
         List<Game> games = gameRepository.getAll();
@@ -71,25 +47,6 @@ public class GameService {
             throw new BusinessLogicException("No games available.");
         }
         return games;
-    }
-
-    /**
-     * Generates the next unique ID for a new game.
-     *
-     * @return The next available ID.
-     */
-    private Integer generateNextId() {
-        List<Game> allGames = gameRepository.getAll();
-
-        if (allGames.isEmpty()) {
-            return 1;
-        }
-
-        Integer maxId = allGames.stream()
-                .map(Game::getId)
-                .max(Integer::compareTo)
-                .orElse(0);
-        return maxId + 1;
     }
 }
 

@@ -5,16 +5,29 @@ import Controller.GameController;
 import Model.Developer;
 import Model.Game;
 import Model.GameGenre;
+import Exception.*;
 
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles the developer-specific menu and its operations, such as publishing,
+ * modifying, and viewing games.
+ */
 public class DeveloperMenu {
     private final DeveloperController developerController;
     private final GameController gameController;
     private final MainMenu mainMenu;
     private final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Constructs the DeveloperMenu with the required controllers and the main menu.
+     *
+     * @param developerController The controller for developer operations.
+     * @param gameController      The controller for game operations.
+     * @param mainMenu            The main menu reference.
+     * @param loggedInDeveloper   The currently logged-in developer.
+     */
     public DeveloperMenu(DeveloperController developerController, GameController gameController, MainMenu mainMenu, Developer loggedInDeveloper) {
         this.developerController = developerController;
         this.gameController = gameController;
@@ -22,6 +35,9 @@ public class DeveloperMenu {
         this.developerController.setDeveloper(loggedInDeveloper);
     }
 
+    /**
+     * Starts the developer menu, displaying available options and handling user input.
+     */
     public void start() {
         while (true) {
             System.out.println("\nDeveloper Menu:");
@@ -53,6 +69,10 @@ public class DeveloperMenu {
 
     //3
 
+    /**
+     * Handles the publishing of a new game.
+     * Collects the required game details from the user and submits them for publishing.
+     */
     private void handlePublishGame() {
         System.out.print("Enter Game Name: ");
         String name = scanner.nextLine();
@@ -71,6 +91,10 @@ public class DeveloperMenu {
 
     //4
 
+    /**
+     * Handles the modification of an existing game.
+     * Collects updated game details from the user and applies changes.
+     */
     private void handleModifyGame() {
         System.out.print("Enter Game ID: ");
         int gameId = scanner.nextInt();
@@ -90,6 +114,9 @@ public class DeveloperMenu {
 
     //5
 
+    /**
+     * Displays all games published by the logged-in developer.
+     */
     private void handleViewPublishedGames() {
         try {
             List<Game> publishedGames = developerController.getPublishedGames();
