@@ -135,7 +135,7 @@ public class CustomerService {
             throw new IllegalStateException("No customer is logged in.");
         }
 
-        List<Game> gamesLibrary = loggedInCustomer.getGamesLibrary();
+        List<Game> gamesLibrary = customerRepository.get(loggedInCustomer.getId()).getGamesLibrary();
         if (gamesLibrary.isEmpty()) {
             throw new EntityNotFoundException("Your games library is empty.");
         }
