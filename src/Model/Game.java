@@ -120,5 +120,23 @@ public class Game implements HasId, Serializable {
     public Integer getId() {
         return gameId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Game game = (Game) obj;
+        return gameId != null && gameId.equals(game.gameId);
+    }
+
+    @Override
+    public int hashCode() {
+        return gameId != null ? gameId.hashCode() : 0;
+    }
+
 }
 

@@ -59,6 +59,9 @@ public class ShoppingCartService {
         }
 
         cart.getListOfGames().add(game);
+        var fundWallet = customerRepository.get(customer.getId()).getFundWallet();
+        customer.setFundWallet(fundWallet);
+        customerRepository.update(customer);
         shoppingCartRepository.update(cart);
     }
 

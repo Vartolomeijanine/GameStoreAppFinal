@@ -35,14 +35,16 @@ public class ReviewService {
             throw new IllegalArgumentException("Rating must be between 1 and 5.");
         }
 
-        Customer customer = loggedInCustomer;
+        Customer customer = customerRepository.get(loggedInCustomer.getId());
 
         Game game = gameRepository.get(gameId);
         if (game == null) {
             throw new IllegalArgumentException("Game not found.");
         }
 
-        if (!customer.getGamesLibrary().contains(game)) {
+        var customerGameLibrary = customer.getGamesLibrary();
+
+        if (!customerGameLibrary.contains(game)) {
             throw new IllegalArgumentException("Customer does not own this game.");
         }
 
