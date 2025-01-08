@@ -15,6 +15,10 @@ import Model.ShoppingCart;
 import java.util.Scanner;
 import java.util.List;
 
+/**
+ * Handles the customer-specific menu and its operations, such as viewing games,
+ * managing the game library, handling the shopping cart, and managing wallet funds.
+ */
 public class CustomerMenu {
     private final CustomerController customerController;
     private final GameController gameController;
@@ -23,6 +27,16 @@ public class CustomerMenu {
     private final MainMenu mainMenu;
     private final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Constructs the CustomerMenu with the required controllers and the main menu.
+     *
+     * @param customerController       The controller for customer-specific operations.
+     * @param gameController           The controller for game operations.
+     * @param mainMenu                 The main menu reference.
+     * @param loggedInCustomer         The currently logged-in customer.
+     * @param shoppingCartController   The controller for shopping cart operations.
+     * @param reviewController         The controller for review operations.
+     */
     public CustomerMenu(CustomerController customerController, GameController gameController, MainMenu mainMenu, Customer loggedInCustomer, ShoppingCartController shoppingCartController, ReviewController reviewController) {
         this.customerController = customerController;
         this.gameController = gameController;
@@ -35,6 +49,9 @@ public class CustomerMenu {
 
     //MENUS
 
+    /**
+     * Displays the customer menu and handles user input for different actions.
+     */
     public void start() {
         while (true) {
             System.out.println("\nCustomer Menu:");
@@ -45,11 +62,10 @@ public class CustomerMenu {
             System.out.println("5. View Wallet Balance");
             System.out.println("6. Game Library Options");
             System.out.println("7. Make a Purchase");
-            System.out.println("8. View Order History");
-            System.out.println("9. View my Own Orders");
-            System.out.println("10. Delete Account");
-            System.out.println("11. Log Out");
-            System.out.println("12. Exit\n");
+            System.out.println("8. View my Own Orders");
+            System.out.println("9. Delete Account");
+            System.out.println("10. Log Out");
+            System.out.println("11. Exit\n");
             System.out.print("Select option: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -62,23 +78,25 @@ public class CustomerMenu {
                 case 5 -> handleViewWalletBalance();
                 case 6 -> handleGameLibraryOptionsMenu();
                 case 7 -> handleShoppingCartMenu();
-                case 8 -> handleViewOrderHistory();
-                case 9 -> handleViewCustomerOrderHistory();
-                case 10 -> {
+                case 8 -> handleViewCustomerOrderHistory();
+                case 9 -> {
                     mainMenu.handleDeleteAccount();
                     return;
                 }
-                case 11 -> {
+                case 10 -> {
                     mainMenu.handleLogOut();
                     return;
                 }
-                case 12 -> mainMenu.exitApp();
+                case 11 -> mainMenu.exitApp();
                 default -> System.out.println("Invalid option. Try again.");
             }
         }
     }
 
-
+    /**
+     * Handles the sorting and filtering menu for games, allowing the user to sort by name or price,
+     * or filter by genre or price range.
+     */
     private void handleSortFilterGames() {
         while (true) {
             System.out.println("\nSort/Filter Games Menu:");
@@ -106,7 +124,10 @@ public class CustomerMenu {
         }
     }
 
-
+    /**
+     * Displays and handles the game library options menu, allowing the customer to add reviews,
+     * view reviews for a specific game, view all reviews, or return to the main customer menu.
+     */
     private void handleGameLibraryOptionsMenu() {
         handleViewGamesLibrary();
 
@@ -137,7 +158,10 @@ public class CustomerMenu {
         }
     }
 
-
+    /**
+     * Displays and handles the shopping cart menu, allowing the customer to list all games,
+     * view the cart, add or remove games, view the total price, checkout, or return to the customer menu.
+     */
     private void handleShoppingCartMenu() {
         while (true) {
             System.out.println("\nShopping Cart Menu:");
@@ -174,24 +198,33 @@ public class CustomerMenu {
 
     //1
 
+    /**
+     * Lists all available games in the shopping cart repository.
+     * Displays the games' names and prices.
+     */
     private void handleListAllGames() {
         try {
             List<Game> allGames = shoppingCartController.getAllGames();
             if (allGames.isEmpty()) {
-                System.out.println("No games available.");
+                throw new EntityNotFoundException("No games available.");
             } else {
                 System.out.println("Available Games:");
                 for (Game game : allGames) {
                     System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
                 }
             }
+        } catch (EntityNotFoundException ex) {
+            System.out.println("Error: " + ex.getMessage());
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
         }
     }
 
     //2
-
+    /**
+     * Searches for games by name or partial name provided by the user.
+     * Displays the details of matching games.
+     */
     private void handleSearchGameByName() {
         System.out.print("Enter the game name or a part of it: ");
         String gameName = scanner.nextLine().trim();
@@ -199,7 +232,7 @@ public class CustomerMenu {
         try {
             List<Game> matchingGames = customerController.searchGameByName(gameName);
             if (matchingGames.isEmpty()) {
-                System.out.println("No games found with the name: " + gameName);
+                throw new EntityNotFoundException("No games found with the name: " + gameName);
             } else {
                 System.out.println("Games matching \"" + gameName + "\":");
                 for (Game game : matchingGames) {
@@ -223,14 +256,19 @@ public class CustomerMenu {
                     System.out.println(gameDetails.toString());
                 }
             }
+        } catch (EntityNotFoundException ex) {
+            System.out.println("Error: " + ex.getMessage());
         } catch (Exception e) {
             System.out.println("An error occurred while searching for games: " + e.getMessage());
         }
-
     }
 
     //3.1
-
+    /**
+     * Handles sorting games by name in ascending order.
+     * Retrieves the sorted list of games and displays them.
+     * Throws an error if no games are available to sort.
+     */
     private void handleSortGamesByNameAscending() {
         try {
             List<Game> sortedGames = customerController.sortGamesByNameAscending();
@@ -245,11 +283,17 @@ public class CustomerMenu {
             }
         } catch (EntityNotFoundException ex) {
             System.out.println("Error: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("An unexpected error occurred: " + ex.getMessage());
         }
     }
 
     //3.2
-
+    /**
+     * Handles sorting games by price in descending order.
+     * Retrieves the sorted list of games and displays them.
+     * Throws an error if no games are available to sort.
+     */
     private void handleSortGamesByPriceDescending() {
         try {
             List<Game> sortedGames = customerController.sortGamesByPriceDescending();
@@ -264,11 +308,17 @@ public class CustomerMenu {
             }
         } catch (EntityNotFoundException ex) {
             System.out.println("Error: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("An unexpected error occurred: " + ex.getMessage());
         }
     }
 
     //3.3
-
+    /**
+     * Handles filtering games by genre.
+     * Prompts the user for a genre, retrieves matching games, and displays them.
+     * Throws an error if the genre is empty or no games match the genre.
+     */
     private void handleFilterByGenre() {
         try {
             System.out.print("Enter genre: ");
@@ -288,11 +338,17 @@ public class CustomerMenu {
             }
         } catch (ValidationException | EntityNotFoundException ex) {
             System.out.println("Error: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("An unexpected error occurred: " + ex.getMessage());
         }
     }
 
     //3.4
-
+    /**
+     * Handles filtering games by price range.
+     * Prompts the user for a minimum and maximum price, retrieves matching games, and displays them.
+     * Throws an error if the price range is invalid or no games match the range.
+     */
     private void handleFilterGamesByPriceRange() {
         try {
             System.out.print("Enter minimum price: ");
@@ -321,7 +377,11 @@ public class CustomerMenu {
     }
 
     //4
-
+    /**
+     * Allows the customer to add funds to their wallet.
+     * Prompts the user for a payment method and the amount to add.
+     * Displays an error message if the amount is invalid or the operation fails.
+     */
     private void handleAddFundsToWallet() {
         System.out.print("Enter payment method (e.g., Visa, AppleCard): ");
         String paymentMethod = scanner.nextLine();
@@ -338,7 +398,10 @@ public class CustomerMenu {
     }
 
     //5
-
+    /**
+     * Displays the customer's current wallet balance.
+     * Displays an error message if no customer is logged in.
+     */
     private void handleViewWalletBalance() {
         try {
             float balance = customerController.getWalletBalance();
@@ -349,12 +412,16 @@ public class CustomerMenu {
     }
 
     //6
-
+    /**
+     * Displays the customer's game library.
+     * If the library is empty, it shows a message indicating no games are available.
+     * Displays details of each game, including reviews if available.
+     */
     private void handleViewGamesLibrary() {
         try {
             List<Game> gamesLibrary = customerController.viewGamesLibrary();
             if (gamesLibrary.isEmpty()) {
-                System.out.println("Your Game Library is empty.");
+                throw new EntityNotFoundException("Your Game Library is empty.");
             } else {
                 System.out.println("Your Game Library:");
                 for (Game game : gamesLibrary) {
@@ -377,6 +444,8 @@ public class CustomerMenu {
                     System.out.println(gameDetails.toString());
                 }
             }
+        } catch (EntityNotFoundException ex) {
+            System.out.println("Error: " + ex.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -384,6 +453,11 @@ public class CustomerMenu {
 
     //6.1
 
+    /**
+     * Allows the customer to leave a review for a game in their library.
+     * Prompts the user for the game ID and a rating (1-5).
+     * Displays a success message upon successful submission or an error message for invalid inputs.
+     */
     private void handleLeaveReview() {
         try {
             System.out.print("Enter the ID of the game to review: ");
@@ -395,15 +469,17 @@ public class CustomerMenu {
 
             reviewController.leaveReview(gameId, rating);
             System.out.println("Review successfully added!\n");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
 
     //6.2
-
+    /**
+     * Displays all reviews for a specific game based on its ID.
+     * Prompts the user for the game ID and displays each review, including the rating and reviewer.
+     * If no reviews are found, a message is displayed.
+     */
     private void handleViewReviewsForGame() {
         try {
             System.out.print("Enter the ID of the game to view reviews: ");
@@ -412,7 +488,7 @@ public class CustomerMenu {
 
             List<Review> reviews = reviewController.getReviewsForGame(gameId);
             if (reviews.isEmpty()) {
-                System.out.println("No reviews found for this game.");
+                throw new EntityNotFoundException("No reviews found for this game.");
             } else {
                 System.out.println("Reviews for the game:");
                 for (Review review : reviews) {
@@ -427,12 +503,16 @@ public class CustomerMenu {
     }
 
     //6.3
-
+    /**
+     * Displays all reviews in the system.
+     * If no reviews are found, a message is displayed.
+     * Displays each review, including the game name, rating, and reviewer.
+     */
     private void handleViewAllReviews() {
         try {
             List<Review> allReviews = reviewController.getAllReviews();
             if (allReviews.isEmpty()) {
-                System.out.println("No reviews found.");
+                throw new EntityNotFoundException("No reviews found.");
             } else {
                 System.out.println("All Reviews:");
                 for (Review review : allReviews) {
@@ -445,7 +525,11 @@ public class CustomerMenu {
     }
 
     //7.2
-
+    /**
+     * Displays the contents of the customer's shopping cart.
+     * If the cart is empty, a message is displayed.
+     * Otherwise, it lists all games in the cart with their names and prices.
+     */
     private void handleViewCart() {
         try {
             int shoppingCartId = customerController.getShoppingCartId();
@@ -453,7 +537,7 @@ public class CustomerMenu {
             List<Game> gamesInCart = cart.getListOfGames();
 
             if (gamesInCart.isEmpty()) {
-                System.out.println("Your cart is empty.");
+                throw new EntityNotFoundException("Your cart is empty.");
             } else {
                 System.out.println("Games in your cart:");
                 for (Game game : gamesInCart) {
@@ -468,7 +552,11 @@ public class CustomerMenu {
     }
 
     //7.3
-
+    /**
+     * Allows the customer to add a game to their shopping cart.
+     * Prompts the user for the game ID and adds it to the cart if it's not already there.
+     * Displays a success message upon completion or an error message for invalid input or logic issues.
+     */
     private void handleAddGameToCart() {
         System.out.print("Enter the ID of the game to add to your cart: ");
         int gameId = scanner.nextInt();
@@ -486,7 +574,11 @@ public class CustomerMenu {
     }
 
     //7.4
-
+    /**
+     * Removes a game from the customer's shopping cart.
+     * Prompts the user for the game ID to remove and updates the cart if successful.
+     * Displays appropriate messages for success or errors.
+     */
     private void handleRemoveGameFromCart() {
         System.out.print("Enter the ID of the game to remove from your cart: ");
         int gameId = scanner.nextInt();
@@ -504,7 +596,11 @@ public class CustomerMenu {
     }
 
     //7.5
-
+    /**
+     * Displays the total price of all games in the customer's shopping cart.
+     * Fetches the cart details and calculates the total price.
+     * Displays appropriate messages for errors or success.
+     */
     private void handleViewCartTotalPrice() {
         try {
             int shoppingCartId = customerController.getShoppingCartId();
@@ -520,7 +616,11 @@ public class CustomerMenu {
     }
 
     //7.6
-
+    /**
+     * Completes the checkout process for the customer's shopping cart.
+     * Fetches the cart details, processes the payment, and finalizes the purchase.
+     * Displays a success message or error messages for any issues.
+     */
     private void handleCheckout() {
         try {
             int shoppingCartId = customerController.getShoppingCartId();
@@ -532,36 +632,16 @@ public class CustomerMenu {
     }
 
     //8
-
-    private void handleViewOrderHistory() {
-        try {
-            List<Order> orders = shoppingCartController.getOrderHistory();
-            if (orders.isEmpty()) {
-                System.out.println("You have not placed any orders yet.");
-                return;
-            }
-
-            System.out.println("Your Order History:");
-            for (Order order : orders) {
-                System.out.println("Order ID: " + order.getOrderId());
-                System.out.println("Games:");
-                for (Game game : order.getPurchasedGames()) {
-                    System.out.println("- " + game.getGameName() + " ($" + game.getPrice() + ")");
-                }
-                System.out.println();
-            }
-        } catch (Exception e) {
-            System.out.println("An error occurred while fetching your order history: " + e.getMessage());
-        }
-    }
-
-    //9
-
+    /**
+     * Displays the order history specific to the currently logged-in customer.
+     * Fetches the customer's orders from the shopping cart controller and displays them.
+     * Displays a message if no orders exist or in case of an error.
+     */
     private void handleViewCustomerOrderHistory() {
         try {
             Customer loggedInCustomer = customerController.getLoggedInCustomer();
             if (loggedInCustomer == null) {
-                throw new IllegalStateException("No customer is currently logged in.");
+                throw new EntityNotFoundException("No customer is currently logged in.");
             }
 
             List<Order> customerOrders = shoppingCartController.getAllOrdersByCustomer(loggedInCustomer);

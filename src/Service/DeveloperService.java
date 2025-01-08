@@ -39,7 +39,8 @@ public class DeveloperService {
      * Publishes a new game by the developer.
      *
      * @param game The game to publish.
-     * @return true if the game is published successfully, false otherwise.
+     * @return true if the game is published successfully.
+     * @throws BusinessLogicException if the developer is not logged in or if a game with the same name already exists.
      */
     public boolean publishGame(Game game) {
         if (loggedInDeveloper == null) {
@@ -75,7 +76,9 @@ public class DeveloperService {
      * @param newDescription  The new description for the game.
      * @param newGenre        The new genre for the game.
      * @param newPrice        The new price for the game.
-     * @return true if the game is modified successfully, false otherwise.
+     * @return true if the game is modified successfully.
+     * @throws BusinessLogicException if the developer is not logged in, the game is not found,
+     *                                or the developer does not own the game.
      */
     public boolean modifyGame(int gameId, String newName, String newDescription, String newGenre, float newPrice) {
         if (loggedInDeveloper == null) {
@@ -108,6 +111,7 @@ public class DeveloperService {
      * Retrieves the list of games published by the developer.
      *
      * @return A list of published games.
+     * @throws BusinessLogicException if the developer is not logged in.
      */
     public List<Game> getPublishedGames() {
         if (loggedInDeveloper == null) {
